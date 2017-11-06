@@ -72,6 +72,8 @@
     <Import Include="System.Threading.Tasks" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="SET.vb" />
+    <Compile Include="MainModule.vb" />
     <Compile Include="Tpolygon.vb" />
     <Compile Include="Main.vb">
       <SubType>Form</SubType>

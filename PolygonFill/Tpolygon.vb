@@ -1,5 +1,5 @@
 ﻿Public Class Tpolygon
-    Dim Vertices As Point() ' array of points
+    Dim Vertices As List(Of Point) ' array of points
     Dim TColor As Color ' color for filling
     Dim isFilled As Boolean 'status of polygon
     Dim Size As Integer ' size of array
@@ -12,8 +12,7 @@
     End Sub
 
     Private Sub InputVertex(point As Point) ' input a vertex
-        ReDim Preserve Vertices(Size)
-        Vertices(Size) = point
+        Vertices.Add(point)
         Size = Size + 1
     End Sub
 
