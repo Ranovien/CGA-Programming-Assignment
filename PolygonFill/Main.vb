@@ -5,7 +5,7 @@
     Dim AET As New LinkedList(Of EdgeTable)
     Dim polyindex As Integer
     Dim TempPolygon As New Tpolygon
-    Dim currx, curry As Integer
+    Dim currx, curry, selectedpoly, selectedpoint As Integer
     'Graphic handler
     Dim bit As Bitmap
     Dim g As Graphics
@@ -68,11 +68,21 @@
         'Update the listbox for point of certain polygon
         Dim temp(2) As String
         temp = Split(PolyList.SelectedItem.ToString, " ")
-        Dim data As Integer = Val(temp(1))
+        selectedpoly = Val(temp(1))
         PointList.Items.Clear()
-        For i As Integer = 0 To PolygonArray(data).Vertices.Count - 1
+        For i As Integer = 0 To PolygonArray(selectedpoly).Vertices.Count - 1
             PointList.Items.Add("Point " + i.ToString)
         Next
+    End Sub
+
+    Private Sub EditPointList(sender As Object, e As EventArgs) Handles PointList.SelectedIndexChanged
+        'Able to edit the selected point of certain polygon
+        Dim temp(2) As String
+        temp = Split(PointList.SelectedItem.ToString, " ")
+        selectedpoint = Val(temp(1))
+        txteditX.Text = PolygonArray(selectedpoly).Vertices(selectedpoint).X
+        txteditY.Text = PolygonArray(selectedpoly).Vertices(selectedpoint).Y
+
     End Sub
 
     Public Sub Display()
