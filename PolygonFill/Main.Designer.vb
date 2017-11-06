@@ -45,7 +45,7 @@ Partial Class Main
         '
         'PictureBox
         '
-        Me.PictureBox.BackColor = System.Drawing.SystemColors.ControlLightLight
+        Me.PictureBox.BackColor = System.Drawing.SystemColors.HighlightText
         Me.PictureBox.Location = New System.Drawing.Point(13, 13)
         Me.PictureBox.Name = "PictureBox"
         Me.PictureBox.Size = New System.Drawing.Size(796, 540)

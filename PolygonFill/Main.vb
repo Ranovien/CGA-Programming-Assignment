@@ -1,8 +1,11 @@
 ﻿Public Class Main
     'Global variables
-    Dim PolygonArray As List(Of Tpolygon)
-    Dim edgetable As List(Of EdgeTable)
-    Dim AET As LinkedList(Of EdgeTable)
+    Dim PolygonArray As New List(Of Tpolygon)
+    Dim edgetable As New List(Of EdgeTable)
+    Dim AET As New LinkedList(Of EdgeTable)
+    Dim polyindex As Integer
+    Dim TempPolygon As New Tpolygon
+    Dim currx, curry As Integer
     'Graphic handler
     Dim bit As Bitmap
     Dim g As Graphics
@@ -14,22 +17,73 @@
     Dim fileReader As String
 
     Private Sub Main_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        'initialize the graphic thingy
         bit = New Bitmap(PictureBox.Width, PictureBox.Height)
         g = Graphics.FromImage(bit)
-        myPen = New Pen(Color.Black, 1)
-        'g.DrawLine(myPen, 3, 1, 3, 1)
-        'g.DrawLine(myPen, 3, 2, 4, 2)
-        'g.DrawLine(myPen, 2, 3, 4, 3)
-        'g.DrawLine(myPen, 2, 4, 5, 4)
-        'g.DrawLine(myPen, 1, 5, 3, 5)
-        'PictureBox.Image = bit
-
+        myPen = New Pen(Color.Black, 5)
+        polyindex = 0
     End Sub
 
     Private Sub MouseMovement(sender As Object, e As MouseEventArgs) Handles PictureBox.MouseMove
-        'Get the cursor position
+        'Get the cursor position, pass it to label
         lblX.Text = e.X
         lblY.Text = e.Y
     End Sub
+
+    Private Sub Getcursor()
+        'Get the cursor position from label, pass it to variable
+        currx = lblX.Text
+        curry = lblY.Text
+    End Sub
+
+    Private Sub DrawPolygon(sender As Object, e As EventArgs) Handles PictureBox.MouseClick
+        'Draw the vertex of the polygon
+        Getcursor()
+        Dim temppoint = New Point(currx, curry)
+        TempPolygon.InputVertex(temppoint)
+    End Sub
+
+    Private Sub EndDrawPolygon(sender As Object, e As EventArgs) Handles PictureBox.MouseDoubleClick
+        'Draw the last vertex of the polygon
+        If (TempPolygon.ispolygon()) Then
+            PolygonArray.Add(TempPolygon)
+            UpdatePolyList()
+            Display()
+            TempPolygon = New Tpolygon
+        Else
+            MsgBox("Need 1 more vertex!")
+        End If
+    End Sub
+
+    Private Sub UpdatePolyList()
+        'Update the listbox for polygon
+        PolyList.Items.Clear()
+        For i As Integer = 0 To PolygonArray.Count - 1
+            PolyList.Items.Add("Polygon " + i.ToString)
+        Next
+    End Sub
+
+
+    Private Sub UpdatePointList(sender As Object, e As EventArgs) Handles PolyList.SelectedIndexChanged
+        'Update the listbox for point of certain polygon
+        Dim temp(2) As String
+        temp = Split(PolyList.SelectedItem.ToString, " ")
+        Dim data As Integer = Val(temp(1))
+        PointList.Items.Clear()
+        For i As Integer = 0 To PolygonArray(data).Vertices.Count - 1
+            PointList.Items.Add("Point " + i.ToString)
+        Next
+    End Sub
+
+    Public Sub Display()
+        'Display the polygon
+        'the Polygon fill may be here
+        For i As Integer = 0 To PolygonArray.Count - 1
+            'DrawpolygonAlt(PolygonArray(i), g)
+            PolygonArray(i).Drawpolygon(g)
+        Next
+        PictureBox.Image = bit
+    End Sub
+
 
 End Class
