@@ -91,6 +91,7 @@
         For i As Integer = 0 To PolygonArray.Count - 1
             'DrawpolygonAlt(PolygonArray(i), g)
             PolygonArray(i).Drawpolygon(g)
+            FillSET(PolygonArray(i))
         Next
         PictureBox.Image = bit
     End Sub

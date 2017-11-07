@@ -3,15 +3,23 @@
     Public TColor As Color ' color for filling
     Public isFilled As Boolean 'status of polygon
     Public Size As Integer ' size of array
+    Public canbefilled As Boolean
 
     Public Sub New() ' constructor
         Vertices = New List(Of Point)
         TColor = Color.Blue
         isFilled = False
         Size = -1
+        canbefilled = True
     End Sub
 
-    Public Function ispolygon()
+    Public Function isAbleToFIlled()
+        'Check if the polygon can be filled or not
+        'Inside outside?
+        Return canbefilled
+    End Function
+
+    Public Function isPolygon()
         Return (Size > 1)
     End Function
 

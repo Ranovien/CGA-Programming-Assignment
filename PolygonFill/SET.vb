@@ -1,12 +1,15 @@
 ﻿Public Class EdgeTable
-    Dim ymax As Integer
-    Dim xmin As Integer
-    Dim dx As Integer
-    Dim dy As Integer
-    Dim carry As Integer
-    Dim Nxt As EdgeTable
+    Public ymin As Integer
+    Public ymax As Integer
+    Public xmin As Integer
+    Public dx As Integer
+    Public dy As Integer
+    Public carry As Integer
+    Public normalize As Integer
+    Public Nxt As EdgeTable
 
-    Private Sub New()
+    Public Sub New()
+        carry = 0
         Nxt = Nothing
     End Sub
 End Class
