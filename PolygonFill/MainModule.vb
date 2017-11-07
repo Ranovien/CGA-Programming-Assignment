@@ -55,6 +55,7 @@
                         'While (edgetable(index).Nxt)
                         'End While
                     End If
+                End If
             Next
 
         End If
