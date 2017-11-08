@@ -1,21 +1,11 @@
 ﻿Module MainModule
 
-    Dim edgetable As EdgeTable()
-    Dim tempET As EdgeTable
+    Dim edgetable As List(Of EdgeTable)
+    'The SET table
+    Dim temp As EdgeTable
+    'Temporary store the part of edgetable data
     Dim AET As New LinkedList(Of EdgeTable)
-
-    Public Sub DrawpolygonAlt(a As Tpolygon, ByRef g As Graphics)
-        Dim Pen As New Pen(a.TColor, 5)
-        For i As Integer = 0 To a.Size - 1
-            g.DrawLine(Pen, a.Vertices(i), a.Vertices(i + 1))
-            'MsgBox(a.Vertices(i).X)
-            If i = a.Size - 1 Then
-                g.DrawLine(Pen, a.Vertices(i + 1), a.Vertices(0))
-            End If
-            'MsgBox("draw")
-        Next
-        Pen.Dispose()
-    End Sub
+    'The AEL 
 
     Public Sub FillPolygon(a As Tpolygon, ByRef g As Graphics, pen As Pen)
         'Fill the edge table
@@ -23,42 +13,92 @@
     End Sub
 
     Public Sub FillSET(a As Tpolygon)
+        'filling the SET if the polygon is valid (doesn't cross)
         If a.isAbleToFIlled Then
+            edgetable = New List(Of EdgeTable)
             Dim min As Integer = getMinimumY(a.Vertices)
             Dim max As Integer = getMaximumY(a.Vertices)
             Dim size As Integer = max - min + 1
             resizeArray(edgetable, size)
+            'resize the array for the iteration in AEL
             Dim d As Integer
-            For i As Integer = 0 To a.Size - 1
+            'the increment
+            For i As Integer = 0 To a.Size
                 d = i + 1
-                If i = a.Size - 1 Then
+                If i = a.Size Then
                     d = 0
                 End If
                 If Not (a.Vertices(i).Y = a.Vertices(d).Y) Then
-                    tempET = New EdgeTable
-                    tempET.normalize = min
-                    tempET.ymin = If(a.Vertices(i).Y < a.Vertices(d).Y, a.Vertices(i).Y, a.Vertices(d).Y)
-                    tempET.ymax = If(a.Vertices(i).Y > a.Vertices(d).Y, a.Vertices(i).Y, a.Vertices(d).Y)
-                    tempET.xmin = If(a.Vertices(i).Y = tempET.ymin, a.Vertices(i).X, a.Vertices(d).X)
-                    tempET.dx = a.Vertices(d).X - a.Vertices(i).X
-                    tempET.dy = a.Vertices(d).Y - a.Vertices(i).Y
-                    If tempET.dy < 0 Then
-                        tempET.dy = -tempET.dy
-                        tempET.dx = -tempET.dx
+                    'If it Is Not horizontal line Then fill all data 
+                    temp = New EdgeTable
+                    temp.normalize = min
+                    temp.ymin = If(a.Vertices(i).Y <= a.Vertices(d).Y, a.Vertices(i).Y, a.Vertices(d).Y)
+                    temp.ymax = If(a.Vertices(i).Y >= a.Vertices(d).Y, a.Vertices(i).Y, a.Vertices(d).Y)
+                    temp.xmin = If(a.Vertices(i).Y <= a.Vertices(d).Y, a.Vertices(i).X, a.Vertices(d).X)
+                    temp.dx = a.Vertices(d).X - a.Vertices(i).X
+                    temp.dy = a.Vertices(d).Y - a.Vertices(i).Y
+                    temp.carry = 0
+                    If temp.dy < 0 Then
+                        temp.dy = -temp.dy
+                        temp.dx = -temp.dx
                     End If
-                    Dim index = tempET.ymin - min
-
-                    If (edgetable(index) Is Nothing) Then
-                        edgetable(tempET.ymin - min) = New EdgeTable
-                        edgetable(tempET.ymin - min) = tempET
+                    Dim index As Integer = temp.ymin - min
+                    If edgetable(index) Is Nothing Then
+                        edgetable(index) = temp
                     Else
-                        'While (edgetable(index).Nxt)
-                        'End While
+                        Dim node As EdgeTable = edgetable(index)
+                        While (True)
+                            If node.xmin < temp.xmin Then
+                                If node.Nxt Is Nothing Then
+                                    edgetable(index) = temp
+                                    Exit While
+                                Else
+                                    node = node.Nxt
+                                End If
+                            ElseIf node.xmin > temp.xmin Then
+                                'edgetable(index).AddBefore(node, tempadd)
+                                Exit While
+                            Else
+                                If (node.dx / node.dy) > (temp.dx / temp.dy) Then
+                                    'edgetable(index).AddBefore(node, tempadd)
+                                    Exit While
+                                Else
+                                    If node Is Nothing Then
+                                        'edgetable(index).AddLast(tempadd)
+                                        Exit While
+                                    Else
+                                        node = node.Nxt
+                                    End If
+                                End If
+                            End If
+                        End While
                     End If
                 End If
             Next
-
+            displaySET(edgetable)
         End If
+    End Sub
+
+    Public Sub resizeArray(a As List(Of EdgeTable), size As Integer)
+        For i As Integer = 0 To size
+            a.Add(Nothing)
+        Next
+    End Sub
+
+    Public Sub displaySET(temp As List(Of EdgeTable))
+        For i = 0 To temp.Count - 1
+            If Not (temp(i) Is Nothing) Then
+                Dim node As EdgeTable = temp(i)
+                While (True)
+                    Dim str As String = ""
+                    str = str + node.xmin.ToString + " " + node.ymin.ToString
+                    str = str + Environment.NewLine
+                    MsgBox(str)
+                    node = node.Nxt
+                End While
+
+            End If
+        Next
     End Sub
 
     Public Function getMinimumY(v As List(Of Point))
@@ -88,11 +128,4 @@
         Next
         Return max
     End Function
-
-    Public Sub resizeArray(s As EdgeTable(), size As Integer)
-        ReDim s(size)
-        For i As Integer = 0 To size
-            s(i) = Nothing
-        Next
-    End Sub
 End Module
