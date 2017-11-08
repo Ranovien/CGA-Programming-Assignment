@@ -53,21 +53,39 @@
                                     edgetable(index) = temp
                                     Exit While
                                 Else
-                                    node = node.Nxt
+                                    node = node.nxt
                                 End If
                             ElseIf node.xmin > temp.xmin Then
                                 'edgetable(index).AddBefore(node, tempadd)
-                                Exit While
+                                Dim store As EdgeTable = node
+                                edgetable(index) = temp
+                                If node.nxt Is Nothing Then
+                                    edgetable(index).nxt = store
+                                    Exit While
+                                Else
+                                    temp = store
+                                    node = node.nxt
+                                End If
                             Else
                                 If (node.dx / node.dy) > (temp.dx / temp.dy) Then
                                     'edgetable(index).AddBefore(node, tempadd)
-                                    Exit While
-                                Else
-                                    If node Is Nothing Then
-                                        'edgetable(index).AddLast(tempadd)
+                                    Dim store As EdgeTable = node
+                                    edgetable(index) = temp
+                                    If node.nxt Is Nothing Then
+                                        edgetable(index).nxt = store
                                         Exit While
                                     Else
-                                        node = node.Nxt
+                                        temp = store
+                                        node = node.nxt
+                                    End If
+                                    Exit While
+                                Else
+                                    If node.nxt Is Nothing Then
+                                        'edgetable(index).AddLast(tempadd)
+                                        edgetable(index).nxt = temp
+                                        Exit While
+                                    Else
+                                        node = node.nxt
                                     End If
                                 End If
                             End If
@@ -90,11 +108,15 @@
             If Not (temp(i) Is Nothing) Then
                 Dim node As EdgeTable = temp(i)
                 While (True)
-                    Dim str As String = ""
-                    str = str + node.xmin.ToString + " " + node.ymin.ToString
-                    str = str + Environment.NewLine
-                    MsgBox(str)
-                    node = node.Nxt
+                    If Not (node Is Nothing) Then
+                        Dim str As String = ""
+                        str = str + node.ymin.ToString + " " + node.ymax.ToString
+                        str = str + Environment.NewLine
+                        MsgBox(str)
+                        node = node.nxt
+                    Else
+                        Exit While
+                    End If
                 End While
 
             End If

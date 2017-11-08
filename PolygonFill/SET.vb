@@ -6,7 +6,7 @@
     Public dy As Integer
     Public carry As Integer
     Public normalize As Integer
-    Public Nxt As EdgeTable
+    Public nxt As EdgeTable
 
     Public Sub New()
         carry = 0
