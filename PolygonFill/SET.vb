@@ -9,7 +9,8 @@
     Public nxt As EdgeTable
 
     Public Sub New()
-        carry = 0
-        Nxt = Nothing
+        carry = Nothing
+        normalize = Nothing
+        nxt = Nothing
     End Sub
 End Class

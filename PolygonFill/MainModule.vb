@@ -2,19 +2,15 @@
 
     Dim edgetable As List(Of EdgeTable)
     'The SET table
-    Dim temp As EdgeTable
-    'Temporary store the part of edgetable data
     Dim AET As EdgeTable
     'The AEL 
 
     Public Sub FillPolygon(a As Tpolygon, ByRef g As Graphics, pen As Pen)
         'Fill the edge table
-        FillSET(a)
+        FillSET(a) ' no bug
         'Set new AET
-        'AET = New EdgeTable
         AET = Nothing
         'Tranverse the AET
-        'MsgBox("boom")
         ProcessAET(g, pen)
     End Sub
 
@@ -24,7 +20,7 @@
             edgetable = New List(Of EdgeTable)
             'get the min and max to know how index that is needed
             Dim min As Integer = getMinimumY(a.vertices)
-            Dim max As Integer = getMaximumY(a.Vertices)
+            Dim max As Integer = getMaximumY(a.vertices)
             Dim size As Integer = max - min + 1
             resizeArray(edgetable, size)
             'resize the array for the iteration in AEL, may cause problem
@@ -38,7 +34,7 @@
                 End If
                 If Not (a.vertices(i).Y = a.vertices(d).Y) Then
                     'If it Is Not horizontal line Then fill all data 
-                    temp = New EdgeTable
+                    Dim temp As New EdgeTable
                     temp.normalize = min
                     temp.ymin = If(a.vertices(i).Y <= a.vertices(d).Y, a.vertices(i).Y, a.vertices(d).Y)
                     temp.ymax = If(a.vertices(i).Y >= a.vertices(d).Y, a.vertices(i).Y, a.vertices(d).Y)
@@ -63,17 +59,22 @@
     Public Sub ProcessAET(ByRef g As Graphics, pen As Pen)
         'Loop from index 0 to Max
         For i As Integer = 0 To edgetable.Count - 1
-
+            'assign the temporary variable to save the current data 
+            Dim current As EdgeTable = edgetable(i)
             'delete the single expired
             CheckSingleExpired(i)
-
             'insert the new edges (sorted)
-            InsertEdgesToAET(i)
+            While Not (current Is Nothing)
+                InsertEdgesToAET(current)
+                current = current.nxt
+            End While
+            'Exit For
             'draw lines (don't forget about the normalization)
             drawlines(i, g, pen)
             'delete the double expired
-            CheckDoubleExpired()
+            'CheckDoubleExpired()
             'update 
+            'displayAET(AET)
             updateAET()
             'sort
             sortAET()
@@ -82,9 +83,10 @@
 
     Public Sub updateAET()
         'create new container
+        Dim temp As EdgeTable = Nothing
         If (CountAET() > 0) Then
-            Dim temp As EdgeTable = Nothing
             Dim data As EdgeTable = AET
+
             While Not (data Is Nothing)
                 'Update the data
                 data.carry = data.carry + data.dx
@@ -124,7 +126,7 @@
     Public Sub drawlines(y As Integer, ByRef g As Graphics, pen As Pen)
         If (CountAET() >= 2) Then
             Dim data As EdgeTable = AET
-            Dim data2 As EdgeTable = AET.nxt
+            Dim data2 As EdgeTable = data.nxt
             While Not (data Is Nothing Or data2 Is Nothing)
                 g.DrawLine(pen, data.xmin, y + data.normalize, data2.xmin, y + data2.normalize)
                 data = data.nxt.nxt
@@ -135,29 +137,26 @@
         End If
     End Sub
 
-    Public Sub InsertEdgesToAET(y As Integer)
+    Public Sub InsertEdgesToAET(data As EdgeTable)
         'Check the scanline, if there is new edge, insert it
-        If Not (edgetable(y) Is Nothing) Then
-            Dim temp As EdgeTable = AET
-            Dim data As EdgeTable = edgetable(y)
-            While Not (data Is Nothing)
-                'insert the new edge
-                sortedInsertion(temp, data)
-                data = data.nxt
-            End While
-            AET = temp
-        End If
-
+        Dim temp As EdgeTable = AET
+        While Not (data Is Nothing)
+            'insert the new edge
+            sortedInsertion(temp, data)
+            data = data.nxt
+        End While
+        AET = temp
     End Sub
 
     Public Sub CheckSingleExpired(y As Integer)
-        Dim temp As New EdgeTable
+        Dim temp As EdgeTable = Nothing
         'create new container
         If (CountAET() >= 1) Then
             Dim data As EdgeTable = AET
             While Not (data Is Nothing)
-                If data.ymin = y Then
+                If (data.ymax - data.normalize) = y Then
                     'delete node by ignoring it
+                    'MsgBox(CountAET().ToString)
                     data = data.nxt
                 Else
                     sortedInsertion(temp, data)
@@ -165,14 +164,13 @@
                 End If
             End While
         End If
-
         AET = temp
         'replace AET with new one
     End Sub
 
     Public Sub CheckDoubleExpired()
         'create new container
-        Dim temp As New EdgeTable
+        Dim temp As EdgeTable = Nothing
         If (CountAET() > 1) Then
             Dim data As EdgeTable = AET
             Dim data2 As EdgeTable = AET.nxt
@@ -203,9 +201,10 @@
             'assign the temp to that index 
             target = temp
         Else
+            'Dim stacker As Stack(Of EdgeTable)
             Dim node As EdgeTable = target
             ' node as the current node that will be used to tranverse the SET
-            While (True)
+            While Not (node Is Nothing)
                 If node.xmin < temp.xmin Then
                     'if xmin value of current node is less than the temp data
                     If node.nxt Is Nothing Then
@@ -281,20 +280,30 @@
         For i = 0 To temp.Count - 1
             If Not (temp(i) Is Nothing) Then
                 Dim node As EdgeTable = temp(i)
-                While (True)
-                    If Not (node Is Nothing) Then
-                        Dim str As String = ""
-                        str = str + node.ymin.ToString + " " + node.ymax.ToString
-                        str = str + Environment.NewLine
-                        MsgBox(str)
-                        node = node.nxt
-                    Else
-                        Exit While
-                    End If
+                Dim str As String
+                While Not (node Is Nothing)
+                    str = ""
+                    str = node.ymin.ToString + " " + node.ymax.ToString + " " + node.xmin.ToString + " " + node.dx.ToString
+                    MsgBox(str)
+                    node = node.nxt
                 End While
 
             End If
         Next
+    End Sub
+
+    Public Sub displayAET(temp As EdgeTable)
+        'to check the content of SET
+        If Not (temp Is Nothing) Then
+            Dim node As EdgeTable = temp
+            Dim str As String
+            While Not (node Is Nothing)
+                str = ""
+                str = str + node.ymin.ToString + " " + node.ymax.ToString + " " + node.xmin.ToString + " " + node.dx.ToString
+                node = node.nxt
+                MsgBox(str)
+            End While
+        End If
     End Sub
 
     Public Function getMinimumY(v As List(Of Point))
