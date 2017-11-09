@@ -1,15 +1,12 @@
 ﻿Public Class Main
     'Global variables
     Dim PolygonArray As New List(Of Tpolygon)
-    Dim edgetable As New List(Of EdgeTable)
-    Dim AET As New LinkedList(Of EdgeTable)
-    Dim polyindex As Integer
     Dim TempPolygon As New Tpolygon
     Dim currx, curry, selectedpoly, selectedpoint As Integer
     'Graphic handler
     Dim bit As Bitmap
     Dim g As Graphics
-    Dim myPen As Pen
+    Dim mypen As Pen
     'Save location
     Dim FILE_PATH As String = IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "file")
     Dim FILE_NAME As String = IO.Path.Combine(FILE_PATH, "file1.txt")
@@ -21,7 +18,6 @@
         bit = New Bitmap(PictureBox.Width, PictureBox.Height)
         g = Graphics.FromImage(bit)
         myPen = New Pen(Color.Black, 5)
-        polyindex = 0
     End Sub
 
     Private Sub MouseMovement(sender As Object, e As MouseEventArgs) Handles PictureBox.MouseMove
@@ -45,7 +41,8 @@
 
     Private Sub EndDrawPolygon(sender As Object, e As EventArgs) Handles PictureBox.MouseDoubleClick
         'Draw the last vertex of the polygon
-        If (TempPolygon.ispolygon()) Then
+        If (TempPolygon.isPolygon()) Then
+            'execute if the polygon is valid
             PolygonArray.Add(TempPolygon)
             UpdatePolyList()
             Display()
@@ -88,11 +85,17 @@
     Public Sub Display()
         'Display the polygon
         'the Polygon fill may be here
+
         For i As Integer = 0 To PolygonArray.Count - 1
             'DrawpolygonAlt(PolygonArray(i), g)
-            PolygonArray(i).Drawpolygon(g)
-            FillSET(PolygonArray(i))
+            If (PolygonArray(i).isfilled = True) Then
+                mypen = New Pen(PolygonArray(i).tcolor, 1)
+                FillPolygon(PolygonArray(i), g, mypen)
+            Else
+                PolygonArray(i).Drawpolygon(g)
+            End If
         Next
+        mypen.Dispose()
         PictureBox.Image = bit
     End Sub
 

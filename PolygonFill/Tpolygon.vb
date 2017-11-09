@@ -1,50 +1,50 @@
 ﻿Public Class Tpolygon
-    Public Vertices As List(Of Point) ' array of points
-    Public TColor As Color ' color for filling
-    Public isFilled As Boolean 'status of polygon
-    Public Size As Integer ' size of array
-    Public canbefilled As Boolean
+    Public vertices As List(Of Point) ' array of points
+    Public tcolor As Color ' color for filling
+    Public isfilled As Boolean 'status of polygon
+    Public size As Integer ' size of array
+    Public canbefilled As Boolean ' check if the polygon is crossed or not
 
     Public Sub New() ' constructor
-        Vertices = New List(Of Point)
-        TColor = Color.Blue
-        isFilled = False
-        Size = -1
+        vertices = New List(Of Point)
+        tcolor = Color.Blue
+        isfilled = True
+        size = -1
         canbefilled = True
     End Sub
-
     Public Function isAbleToFIlled()
         'Check if the polygon can be filled or not
         'Inside outside?
+        'Handy, tolong kerjain yg ini~~
         Return canbefilled
     End Function
 
     Public Function isPolygon()
-        Return (Size > 1)
+        Return (size > 1)
     End Function
 
     Public Sub InputVertex(point As Point) ' input a vertex
-        Vertices.Add(point)
-        Size = Size + 1
+        vertices.Add(point)
+        size = size + 1
     End Sub
 
     Public Sub ChangeColor(color As Color) ' change the color of filling
-        TColor = color
+        tcolor = color
     End Sub
 
     Public Sub ChangeFillStatus() ' change the polygon from fill/hollow
-        isFilled = Not isFilled
+        isfilled = Not isfilled
     End Sub
 
     Public Sub Drawpolygon(ByRef g As Graphics)
-        Dim Pen As New Pen(TColor, 1)
-        For i As Integer = 0 To Size - 1
-            g.DrawLine(Pen, Vertices(i), Vertices(i + 1))
-            If i = Size - 1 Then
-                g.DrawLine(Pen, Vertices(i + 1), Vertices(0))
+        Dim pen As New Pen(tcolor, 1)
+        For i As Integer = 0 To size - 1
+            g.DrawLine(pen, vertices(i), vertices(i + 1))
+            If i = size - 1 Then
+                g.DrawLine(pen, vertices(i + 1), vertices(0))
             End If
         Next
-        Pen.Dispose()
+        pen.Dispose()
     End Sub
 
 End Class
