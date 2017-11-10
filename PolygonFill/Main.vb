@@ -63,7 +63,7 @@
                 Display()
                 TerminateEditMode()
             End If
-            End If
+        End If
     End Sub
 
     Private Sub EndDrawPolygon(sender As Object, e As EventArgs) Handles PictureBox.MouseDoubleClick
@@ -178,8 +178,8 @@
         Dim temp(2) As String
         temp = Split(PointList.SelectedItem.ToString, " ")
         selectedpoint = Val(temp(1))
-        txteditX.Text = PolygonArray(selectedpoly).Vertices(selectedpoint).X
-        txteditY.Text = PolygonArray(selectedpoly).Vertices(selectedpoint).Y
+        txteditX.Text = PolygonArray(selectedpoly).vertices(selectedpoint).X
+        txteditY.Text = PolygonArray(selectedpoly).vertices(selectedpoint).Y
 
     End Sub
 
