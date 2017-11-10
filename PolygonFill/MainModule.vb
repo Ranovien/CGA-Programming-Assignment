@@ -4,6 +4,7 @@
     'The SET table
     Dim AET As EdgeTable
     'The AEL 
+    Dim stacker As New Stack(Of EdgeTable)
 
     Public Sub FillPolygon(a As Tpolygon, ByRef g As Graphics, pen As Pen)
         'Fill the edge table
@@ -58,26 +59,26 @@
 
     Public Sub ProcessAET(ByRef g As Graphics, pen As Pen)
         'Loop from index 0 to Max
+        Dim current As EdgeTable
         For i As Integer = 0 To edgetable.Count - 1
             'assign the temporary variable to save the current data 
-            Dim current As EdgeTable = edgetable(i)
+            current = edgetable(i)
             'delete the single expired
-            CheckSingleExpired(i)
+            If i > 0 Then CheckSingleExpiredStackVersion(i)
             'insert the new edges (sorted)
             While Not (current Is Nothing)
-                InsertEdgesToAET(current)
-                current = current.nxt
+                    InsertEdgesToAET(current)
+                    current = current.nxt
             End While
-            'Exit For
             'draw lines (don't forget about the normalization)
             drawlines(i, g, pen)
             'delete the double expired
-            'CheckDoubleExpired()
+            'CheckDoubleExpiredStackVersion()
             'update 
-            'displayAET(AET)
-            updateAET()
+            updateAETStackVersion()
             'sort
             sortAET()
+            'sortAETStackVersion() ' is failed
         Next
     End Sub
 
@@ -86,7 +87,6 @@
         Dim temp As EdgeTable = Nothing
         If (CountAET() > 0) Then
             Dim data As EdgeTable = AET
-
             While Not (data Is Nothing)
                 'Update the data
                 data.carry = data.carry + data.dx
@@ -109,18 +109,89 @@
         'replace AET with new one
     End Sub
 
+    Public Sub updateAETStackVersion()
+        'this process uses stack
+        stacker.Clear()
+        If (CountAET() > 0) Then
+            Dim data As EdgeTable = AET
+            While Not (data Is Nothing)
+                'Update the data
+                data.carry = data.carry + data.dx
+                If (data.dx < 0) Then
+                    While (-(data.carry + data.carry) >= data.dy)
+                        data.carry = data.carry + data.dy
+                        data.xmin = data.xmin - 1
+                    End While
+                Else
+                    While ((data.carry + data.carry) >= data.dy)
+                        data.carry = data.carry - data.dy
+                        data.xmin = data.xmin + 1
+                    End While
+                End If
+                stacker.Push(data)
+                data = data.nxt
+            End While
+            refillAET(stacker, AET)
+            'replace AET with new one
+        End If
+    End Sub
+
     Public Sub sortAET()
         Dim temp As EdgeTable = Nothing
         'create new container
-        If Not (AET Is Nothing) Then
-            Dim data As EdgeTable = AET
-            While Not (data Is Nothing)
-                sortedInsertion(temp, data)
-                data = data.nxt
-            End While
-        End If
+        Dim data As EdgeTable = AET
+        While Not (data Is Nothing)
+            sortedInsertion(temp, data)
+            data = data.nxt
+        End While
         AET = temp
         'replace AET with new one
+    End Sub
+
+    Public Sub sortAETStackVersion()
+        'this process uses stack
+        If Not (CountAET() = 0) Then
+            Dim data As EdgeTable = AET
+            Dim nextdata As EdgeTable = AET.nxt
+            While Not (data Is Nothing)
+                If data.xmin < nextdata.xmin Then
+                    stacker.Push(data)
+                    If nextdata.nxt Is Nothing Then
+                        stacker.Push(nextdata)
+                    Else
+                        data = data.nxt
+                        nextdata = nextdata.nxt
+                    End If
+                ElseIf data.xmin > nextdata.xmin Then
+                    stacker.Push(nextdata)
+                    If nextdata.nxt Is Nothing Then
+                        stacker.Push(data)
+                    Else
+                        nextdata = nextdata.nxt
+                    End If
+                Else
+                    If (data.dx / data.dy) <= (nextdata.dx / nextdata.dy) Then
+                        stacker.Push(data)
+                        If nextdata.nxt Is Nothing Then
+                            stacker.Push(nextdata)
+                        Else
+                            data = data.nxt
+                            nextdata = nextdata.nxt
+                        End If
+                    Else
+                        stacker.Push(nextdata)
+                        If nextdata.nxt Is Nothing Then
+                            stacker.Push(data)
+                        Else
+                            nextdata = nextdata.nxt
+                        End If
+                    End If
+                End If
+            End While
+            refillAET(stacker, AET)
+            'replace AET with new one
+            stacker.Clear()
+        End If
     End Sub
 
     Public Sub drawlines(y As Integer, ByRef g As Graphics, pen As Pen)
@@ -156,7 +227,6 @@
             While Not (data Is Nothing)
                 If (data.ymax - data.normalize) = y Then
                     'delete node by ignoring it
-                    'MsgBox(CountAET().ToString)
                     data = data.nxt
                 Else
                     sortedInsertion(temp, data)
@@ -166,6 +236,26 @@
         End If
         AET = temp
         'replace AET with new one
+    End Sub
+
+    Public Sub CheckSingleExpiredStackVersion(y As Integer)
+        'This process uses stack 
+        If (CountAET() >= 1) Then
+            stacker.Clear()
+            Dim data As EdgeTable = AET
+            While Not (data Is Nothing)
+                If (data.ymax - data.normalize) = y Then
+                    'delete node by ignoring it
+                    data = data.nxt
+                Else
+                    stacker.Push(data)
+                    data = data.nxt
+                End If
+            End While
+            refillAET(stacker, AET)
+            'replace AET with new one
+            stacker.Clear()
+        End If
     End Sub
 
     Public Sub CheckDoubleExpired()
@@ -195,35 +285,71 @@
         'replace AET with new one
     End Sub
 
+    Public Sub CheckDoubleExpiredStackVersion()
+        'this process uses stack
+        If (CountAET() >= 2) Then
+            stacker.Clear()
+            Dim data As EdgeTable = AET
+            Dim data2 As EdgeTable = AET.nxt
+            While Not (data Is Nothing Or data2 Is Nothing)
+                If (data.xmin = data2.xmin) And (data.carry = 0) And (data2.carry = 0) Then
+                    'delete node by ignoring it
+                    data = data.nxt.nxt
+                    If Not (data Is Nothing) Then
+                        data2 = data.nxt
+                    End If
+                Else
+                    stacker.Push(data)
+                    stacker.Push(data2)
+                    data = data.nxt.nxt
+                    If Not (data Is Nothing) Then
+                        data2 = data.nxt
+                    End If
+                End If
+            End While
+            refillAET(stacker, AET)
+            'replace AET with new one
+            stacker.Clear()
+        End If
+
+    End Sub
+
     Public Sub sortedInsertion(ByRef target As EdgeTable, temp As EdgeTable)
         If target Is Nothing Then
             'if there is no data in that index
             'assign the temp to that index 
             target = temp
         Else
-            'Dim stacker As Stack(Of EdgeTable)
+            stacker.Clear()
+            Dim targettemp As EdgeTable = Nothing
             Dim node As EdgeTable = target
+            Dim i As Integer = 0
             ' node as the current node that will be used to tranverse the SET
             While Not (node Is Nothing)
                 If node.xmin < temp.xmin Then
                     'if xmin value of current node is less than the temp data
                     If node.nxt Is Nothing Then
                         'assign it, it's the last place
-                        target.nxt = temp
+                        'target.nxt = temp
+                        If i = 0 Then stacker.Push(node)
+                        stacker.Push(temp)
                         Exit While
                     Else
                         'it's not the last place, tranverse the SET
+                        stacker.Push(node)
                         node = node.nxt
                     End If
                 ElseIf node.xmin > temp.xmin Then
                     'if xmin value of current node is more than the temp data
                     Dim store As EdgeTable = node
                     'store the current node's data
-                    target = temp
+                    'target = temp
+                    stacker.Push(temp)
                     'replace the current node with the temp data
                     If node.nxt Is Nothing Then
                         'if it's the last, just assign the stored data to the last
-                        target.nxt = store
+                        'target.nxt = store
+                        stacker.Push(node)
                         Exit While
                     Else
                         'if it's not the last
@@ -237,11 +363,13 @@
                         'if value of current node is more than the temp data
                         Dim store As EdgeTable = node
                         'store the current node's data
-                        target = temp
+                        'target = temp
+                        stacker.Push(temp)
                         'replace the current node with the temp data
                         If node.nxt Is Nothing Then
                             'if it's the last, just assign the stored data to the last
-                            target.nxt = store
+                            'target.nxt = store
+                            stacker.Push(node)
                             Exit While
                         Else
                             'if it's not the last
@@ -249,24 +377,51 @@
                             temp = store
                             node = node.nxt
                         End If
-                        Exit While
+
                     Else
                         'if the value of current node is same or less than the temp data
                         If node.nxt Is Nothing Then
                             'If it's the last, just assign the stored data to the last
-                            target.nxt = temp
+                            'target.nxt = temp
+                            If i = 0 Then stacker.Push(node)
+                            stacker.Push(temp)
                             Exit While
                         Else
                             'if it's not the last
                             'tranverse the SET
+                            stacker.Push(node)
                             node = node.nxt
                         End If
                     End If
                 End If
+                i = i + 1
             End While
+            'MsgBox(stacker.Count())
+            refillAET(stacker, targettemp)
+            target = targettemp
+            stacker.Clear()
         End If
     End Sub
 
+    Public Sub refillAET(ByRef s As Stack(Of EdgeTable), ByRef target As EdgeTable)
+
+        target = Nothing
+        Dim prevtemp As New EdgeTable
+        Dim temp As EdgeTable
+        If s.Count > 0 Then
+            temp = s.Pop()
+            temp.nxt = Nothing
+        Else
+            temp = Nothing
+        End If
+        While s.Count() > 0
+            prevtemp = s.Pop()
+            'MsgBox(prevtemp.xmin.ToString + " " + prevtemp.ymax.ToString)
+            prevtemp.nxt = temp
+            temp = prevtemp
+        End While
+        target = temp
+    End Sub
 
     Public Sub resizeArray(a As List(Of EdgeTable), size As Integer)
         'resizing array and assign the NULL value to each index
