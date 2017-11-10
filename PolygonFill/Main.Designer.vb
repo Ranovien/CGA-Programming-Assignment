@@ -28,7 +28,7 @@ Partial Class Main
         Me.txteditX = New System.Windows.Forms.TextBox()
         Me.txteditY = New System.Windows.Forms.TextBox()
         Me.btndelpoly = New System.Windows.Forms.Button()
-        Me.btnEdit = New System.Windows.Forms.Button()
+        Me.btnAdd = New System.Windows.Forms.Button()
         Me.btndelpoint = New System.Windows.Forms.Button()
         Me.lblXEdit = New System.Windows.Forms.Label()
         Me.lblYEdit = New System.Windows.Forms.Label()
@@ -40,6 +40,9 @@ Partial Class Main
         Me.lblYpos = New System.Windows.Forms.Label()
         Me.lblX = New System.Windows.Forms.Label()
         Me.lblY = New System.Windows.Forms.Label()
+        Me.lblColor = New System.Windows.Forms.Label()
+        Me.lblToggle = New System.Windows.Forms.Label()
+        Me.btnEndEdit = New System.Windows.Forms.Button()
         CType(Me.PictureBox, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
@@ -74,6 +77,7 @@ Partial Class Main
         '
         Me.txteditX.Location = New System.Drawing.Point(933, 323)
         Me.txteditX.Name = "txteditX"
+        Me.txteditX.ReadOnly = True
         Me.txteditX.Size = New System.Drawing.Size(128, 26)
         Me.txteditX.TabIndex = 3
         '
@@ -81,6 +85,7 @@ Partial Class Main
         '
         Me.txteditY.Location = New System.Drawing.Point(933, 355)
         Me.txteditY.Name = "txteditY"
+        Me.txteditY.ReadOnly = True
         Me.txteditY.Size = New System.Drawing.Size(128, 26)
         Me.txteditY.TabIndex = 4
         '
@@ -93,14 +98,14 @@ Partial Class Main
         Me.btndelpoly.Text = "Delete Polygon"
         Me.btndelpoly.UseVisualStyleBackColor = True
         '
-        'btnEdit
+        'btnAdd
         '
-        Me.btnEdit.Location = New System.Drawing.Point(834, 323)
-        Me.btnEdit.Name = "btnEdit"
-        Me.btnEdit.Size = New System.Drawing.Size(58, 58)
-        Me.btnEdit.TabIndex = 6
-        Me.btnEdit.Text = "Edit"
-        Me.btnEdit.UseVisualStyleBackColor = True
+        Me.btnAdd.Location = New System.Drawing.Point(834, 323)
+        Me.btnAdd.Name = "btnAdd"
+        Me.btnAdd.Size = New System.Drawing.Size(58, 58)
+        Me.btnAdd.TabIndex = 6
+        Me.btnAdd.Text = "Add"
+        Me.btnAdd.UseVisualStyleBackColor = True
         '
         'btndelpoint
         '
@@ -135,23 +140,23 @@ Partial Class Main
         Me.btnToggle.Name = "btnToggle"
         Me.btnToggle.Size = New System.Drawing.Size(99, 31)
         Me.btnToggle.TabIndex = 10
-        Me.btnToggle.Text = "Fill"
+        Me.btnToggle.Text = "Fill/Hollow"
         Me.btnToggle.UseVisualStyleBackColor = True
         '
         'btnSave
         '
-        Me.btnSave.Location = New System.Drawing.Point(834, 527)
+        Me.btnSave.Location = New System.Drawing.Point(957, 527)
         Me.btnSave.Name = "btnSave"
-        Me.btnSave.Size = New System.Drawing.Size(99, 31)
+        Me.btnSave.Size = New System.Drawing.Size(78, 31)
         Me.btnSave.TabIndex = 11
         Me.btnSave.Text = "Save"
         Me.btnSave.UseVisualStyleBackColor = True
         '
         'btnLoad
         '
-        Me.btnLoad.Location = New System.Drawing.Point(1008, 527)
+        Me.btnLoad.Location = New System.Drawing.Point(1039, 527)
         Me.btnLoad.Name = "btnLoad"
-        Me.btnLoad.Size = New System.Drawing.Size(106, 31)
+        Me.btnLoad.Size = New System.Drawing.Size(75, 31)
         Me.btnLoad.TabIndex = 12
         Me.btnLoad.Text = "Load"
         Me.btnLoad.UseVisualStyleBackColor = True
@@ -168,7 +173,7 @@ Partial Class Main
         'lblXpos
         '
         Me.lblXpos.AutoSize = True
-        Me.lblXpos.Location = New System.Drawing.Point(830, 485)
+        Me.lblXpos.Location = New System.Drawing.Point(953, 485)
         Me.lblXpos.Name = "lblXpos"
         Me.lblXpos.Size = New System.Drawing.Size(28, 20)
         Me.lblXpos.TabIndex = 14
@@ -177,7 +182,7 @@ Partial Class Main
         'lblYpos
         '
         Me.lblYpos.AutoSize = True
-        Me.lblYpos.Location = New System.Drawing.Point(986, 485)
+        Me.lblYpos.Location = New System.Drawing.Point(1040, 485)
         Me.lblYpos.Name = "lblYpos"
         Me.lblYpos.Size = New System.Drawing.Size(28, 20)
         Me.lblYpos.TabIndex = 15
@@ -186,7 +191,7 @@ Partial Class Main
         'lblX
         '
         Me.lblX.AutoSize = True
-        Me.lblX.Location = New System.Drawing.Point(864, 485)
+        Me.lblX.Location = New System.Drawing.Point(987, 485)
         Me.lblX.Name = "lblX"
         Me.lblX.Size = New System.Drawing.Size(14, 20)
         Me.lblX.TabIndex = 16
@@ -195,17 +200,52 @@ Partial Class Main
         'lblY
         '
         Me.lblY.AutoSize = True
-        Me.lblY.Location = New System.Drawing.Point(1020, 485)
+        Me.lblY.Location = New System.Drawing.Point(1074, 485)
         Me.lblY.Name = "lblY"
         Me.lblY.Size = New System.Drawing.Size(14, 20)
         Me.lblY.TabIndex = 17
         Me.lblY.Text = "-"
+        '
+        'lblColor
+        '
+        Me.lblColor.AutoSize = True
+        Me.lblColor.BackColor = System.Drawing.SystemColors.InfoText
+        Me.lblColor.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+        Me.lblColor.Location = New System.Drawing.Point(957, 442)
+        Me.lblColor.Name = "lblColor"
+        Me.lblColor.Size = New System.Drawing.Size(87, 22)
+        Me.lblColor.TabIndex = 18
+        Me.lblColor.Text = "                   "
+        '
+        'lblToggle
+        '
+        Me.lblToggle.AutoSize = True
+        Me.lblToggle.Location = New System.Drawing.Point(957, 410)
+        Me.lblToggle.Name = "lblToggle"
+        Me.lblToggle.Size = New System.Drawing.Size(108, 20)
+        Me.lblToggle.TabIndex = 19
+        Me.lblToggle.Text = "Mode : Hollow"
+        '
+        'btnEndEdit
+        '
+        Me.btnEndEdit.AccessibleRole = System.Windows.Forms.AccessibleRole.None
+        Me.btnEndEdit.Enabled = False
+        Me.btnEndEdit.Location = New System.Drawing.Point(834, 481)
+        Me.btnEndEdit.Name = "btnEndEdit"
+        Me.btnEndEdit.Size = New System.Drawing.Size(99, 72)
+        Me.btnEndEdit.TabIndex = 20
+        Me.btnEndEdit.Text = "End Edit Mode"
+        Me.btnEndEdit.UseVisualStyleBackColor = True
+        Me.btnEndEdit.Visible = False
         '
         'Main
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(1126, 570)
+        Me.Controls.Add(Me.btnEndEdit)
+        Me.Controls.Add(Me.lblToggle)
+        Me.Controls.Add(Me.lblColor)
         Me.Controls.Add(Me.lblY)
         Me.Controls.Add(Me.lblX)
         Me.Controls.Add(Me.lblYpos)
@@ -217,7 +257,7 @@ Partial Class Main
         Me.Controls.Add(Me.lblYEdit)
         Me.Controls.Add(Me.lblXEdit)
         Me.Controls.Add(Me.btndelpoint)
-        Me.Controls.Add(Me.btnEdit)
+        Me.Controls.Add(Me.btnAdd)
         Me.Controls.Add(Me.btndelpoly)
         Me.Controls.Add(Me.txteditY)
         Me.Controls.Add(Me.txteditX)
@@ -238,7 +278,7 @@ Partial Class Main
     Friend WithEvents txteditX As TextBox
     Friend WithEvents txteditY As TextBox
     Friend WithEvents btndelpoly As Button
-    Friend WithEvents btnEdit As Button
+    Friend WithEvents btnAdd As Button
     Friend WithEvents btndelpoint As Button
     Friend WithEvents lblXEdit As Label
     Friend WithEvents lblYEdit As Label
@@ -250,4 +290,7 @@ Partial Class Main
     Friend WithEvents lblYpos As Label
     Friend WithEvents lblX As Label
     Friend WithEvents lblY As Label
+    Friend WithEvents lblColor As Label
+    Friend WithEvents lblToggle As Label
+    Friend WithEvents btnEndEdit As Button
 End Class

@@ -8,7 +8,7 @@
     Public Sub New() ' constructor
         vertices = New List(Of Point)
         tcolor = Color.Blue
-        isfilled = True
+        isfilled = False
         size = -1
         canbefilled = True
     End Sub
@@ -26,6 +26,11 @@
     Public Sub InputVertex(point As Point) ' input a vertex
         vertices.Add(point)
         size = size + 1
+    End Sub
+
+    Public Sub replaceVertex(point As Point, i As Integer) ' replace the vertex with the new one
+        ' i = index
+        vertices(i) = point
     End Sub
 
     Public Sub ChangeColor(color As Color) ' change the color of filling
