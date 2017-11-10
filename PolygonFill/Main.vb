@@ -213,11 +213,11 @@
     End Sub
 
     Private Sub EnableAddMode(sender As Object, e As EventArgs) Handles btnAdd.Click
-        editmode = True
-        editpointmode = True
-        addmode = True
-        btnEndEdit.Visible = True
-        btnEndEdit.Enabled = True
+        If editmode = True And editpointmode = True Then
+            addmode = True
+        Else
+            MsgBox("Enter the edit mode first by clicking the point listbox!!")
+        End If
     End Sub
 
     Private Sub Colorpicker(sender As Object, e As EventArgs) Handles btnColorpick.Click
