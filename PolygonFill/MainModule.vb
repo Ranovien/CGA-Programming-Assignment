@@ -73,7 +73,7 @@
             'draw lines (don't forget about the normalization)
             drawlines(i, g, pen)
             'delete the double expired
-            'CheckDoubleExpiredStackVersion()
+            'CheckDoubleExpiredStackVersion() 'cause bug
             'update 
             updateAETStackVersion()
             'sort
