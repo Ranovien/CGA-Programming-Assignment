@@ -87,6 +87,7 @@
     <Import Include="System.Threading.Tasks" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AEL.vb" />
     <Compile Include="SET.vb" />
     <Compile Include="MainModule.vb" />
     <Compile Include="Tpolygon.vb" />

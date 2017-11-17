@@ -2,7 +2,7 @@
 
     Dim edgetable As List(Of EdgeTable)
     'The SET table
-    Dim AET As EdgeTable
+    Dim AET As AEL
     'The AEL 
     Dim stacker As New Stack(Of EdgeTable)
 
@@ -10,7 +10,7 @@
         'Fill the edge table
         FillSET(a) ' no bug
         'Set new AET
-        AET = Nothing
+        AET = New AEL
         'Tranverse the AET
         ProcessAET(g, pen)
     End Sub
@@ -53,7 +53,6 @@
                     sortedInsertion(edgetable(index), temp)
                 End If
             Next
-            'displaySET(edgetable) 'to check the result
         End If
     End Sub
 
@@ -64,18 +63,18 @@
             'assign the temporary variable to save the current data 
             current = edgetable(i)
             'delete the single expired
-            If i > 0 Then CheckSingleExpiredStackVersion(i)
+            If i > 0 Then CheckSingleExpired(i)
             'insert the new edges (sorted)
             While Not (current Is Nothing)
-                    InsertEdgesToAET(current)
-                    current = current.nxt
+                InsertEdgesToAET(current)
+                current = current.nxt
             End While
             'draw lines (don't forget about the normalization)
             drawlines(i, g, pen)
             'delete the double expired
-            'CheckDoubleExpiredStackVersion() 'cause bug
+            CheckDoubleExpired() 'cause bug
             'update 
-            updateAETStackVersion()
+            updateAET()
             'sort
             sortAET()
             'sortAETStackVersion() ' is failed
@@ -83,37 +82,10 @@
     End Sub
 
     Public Sub updateAET()
-        'create new container
-        Dim temp As EdgeTable = Nothing
-        If (CountAET() > 0) Then
-            Dim data As EdgeTable = AET
-            While Not (data Is Nothing)
-                'Update the data
-                data.carry = data.carry + data.dx
-                If (data.dx < 0) Then
-                    While (-(data.carry + data.carry) >= data.dy)
-                        data.carry = data.carry + data.dy
-                        data.xmin = data.xmin - 1
-                    End While
-                Else
-                    While ((data.carry + data.carry) >= data.dy)
-                        data.carry = data.carry - data.dy
-                        data.xmin = data.xmin + 1
-                    End While
-                End If
-                sortedInsertion(temp, data)
-                data = data.nxt
-            End While
-        End If
-        AET = temp
-        'replace AET with new one
-    End Sub
-
-    Public Sub updateAETStackVersion()
-        'this process uses stack
-        stacker.Clear()
-        If (CountAET() > 0) Then
-            Dim data As EdgeTable = AET
+        If (AET.length > 0) Then
+            stacker.Clear()
+            Dim temp As EdgeTable = Nothing
+            Dim data As EdgeTable = AET.head
             While Not (data Is Nothing)
                 'Update the data
                 data.carry = data.carry + data.dx
@@ -131,10 +103,11 @@
                 stacker.Push(data)
                 data = data.nxt
             End While
-            refillAET(stacker, AET)
-            'replace AET with new one
+            refillAET(stacker, temp)
+            AET.head = temp
         End If
     End Sub
+
 
     Public Sub sortAET()
         Dim temp As EdgeTable = Nothing
@@ -196,7 +169,7 @@
 
     Public Sub drawlines(y As Integer, ByRef g As Graphics, pen As Pen)
         If (CountAET() >= 2) Then
-            Dim data As EdgeTable = AET
+            Dim data As EdgeTable = AET.head
             Dim data2 As EdgeTable = data.nxt
             While Not (data Is Nothing Or data2 Is Nothing)
                 g.DrawLine(pen, data.xmin, y + data.normalize, data2.xmin, y + data2.normalize)
@@ -210,26 +183,19 @@
 
     Public Sub InsertEdgesToAET(data As EdgeTable)
         'Check the scanline, if there is new edge, insert it
-        Dim temp As EdgeTable = AET
-        While Not (data Is Nothing)
-            'insert the new edge
-            sortedInsertion(temp, data)
-            data = data.nxt
-        End While
-        AET = temp
+        AET.add(data.ymin, data.ymax, data.xmin, data.dx, data.dy, data.normalize, data.carry)
     End Sub
 
     Public Sub CheckSingleExpired(y As Integer)
-        Dim temp As EdgeTable = Nothing
         'create new container
-        If (CountAET() >= 1) Then
-            Dim data As EdgeTable = AET
+        If (AET.length > 0) Then
+            Dim data As EdgeTable = AET.head
             While Not (data Is Nothing)
                 If (data.ymax - data.normalize) = y Then
-                    'delete node by ignoring it
+                    'delete node
+                    AET.remove()
                     data = data.nxt
                 Else
-                    sortedInsertion(temp, data)
                     data = data.nxt
                 End If
             End While
