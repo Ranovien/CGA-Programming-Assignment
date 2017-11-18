@@ -8,7 +8,7 @@
     Public Sub New()
         head = Nothing
         length = 0
-        s.Clear()
+        Me.s = New Stack(Of EdgeTable)
     End Sub
 
     Public Sub add(tempdata As EdgeTable)
@@ -20,13 +20,11 @@
             Me.head = node
             Me.length = 1
         Else
-            While currentNode IsNot Nothing
+            While Not (currentNode Is Nothing)
                 If node.xmin < currentNode.xmin OrElse (node.xmin = currentNode.xmin AndAlso node.dx / node.dy < currentNode.dx / currentNode.dy) Then
                     s.Push(node)
-                    If currentNode.nxt IsNot Nothing Then
-                        s.Push(currentNode)
-                        Exit While
-                    End If
+                    s.Push(currentNode)
+                    Exit While
                 Else
                     s.Push(currentNode)
                     If currentNode.nxt Is Nothing Then
@@ -48,7 +46,6 @@
 
         ' an invalid position
 
-
         ' the first node is removed
         If position = 1 Then
             Me.head = currentNode.nxt
@@ -59,7 +56,7 @@
                 s.Push(currentNode)
                 currentNode = currentNode.nxt
             Next
-            If currentNode.nxt IsNot Nothing Then
+            If Not (currentNode.nxt Is Nothing) Then
                 s.Push(currentNode.nxt)
             End If
             refillAET()
@@ -70,7 +67,7 @@
         'by created by kevin
         If length > 0 Then
             Dim currentNode As EdgeTable = Me.head
-            While currentNode IsNot Nothing
+            While Not (currentNode Is Nothing)
                 'Update the data
                 currentNode.carry = currentNode.carry + currentNode.dx
                 If (currentNode.dx < 0) Then
@@ -94,14 +91,48 @@
     Public Sub sorted()
         Dim currentNode As EdgeTable = Me.head
         Me.head = Nothing
-        While currentNode IsNot Nothing
+        While Not (currentNode Is Nothing)
             Me.add(currentNode)
             currentNode = currentNode.nxt
         End While
     End Sub
 
+    Public Sub single_expired(i As Integer)
+        If length > 0 Then
+            Dim currentNode As EdgeTable = Me.head
+            While Not (currentNode Is Nothing)
+                If (currentNode.ymax - currentNode.normalize) = i Then
+                    'ignore
+                Else
+                    s.Push(currentNode)
+                End If
+                currentNode = currentNode.nxt
+            End While
+            refillAET()
+        End If
+    End Sub
+
+    Public Sub double_expired(i As Integer)
+        If length > 1 Then
+            Dim currentNode As EdgeTable = Me.head
+            Dim nextnode As EdgeTable = currentNode.nxt
+            While Not (currentNode Is Nothing)
+                If (currentNode.xmin = nextnode.xmin) AndAlso currentNode.carry = nextnode.carry = 0 Then
+                    If (Not ((currentNode.ymin - currentNode.normalize) = i)) And Not ((nextnode.ymin - nextnode.normalize) = i) Then
+                        'ignore
+                    End If
+                Else
+                    s.Push(currentNode)
+                End If
+                currentNode = currentNode.nxt
+            End While
+            refillAET()
+        End If
+    End Sub
+
     Private Sub refillAET()
-        Me.head = Nothing
+        If Not (s.Count = 0) Then
+            Me.head = Nothing
         Dim prevtemp As New EdgeTable
         Dim temp As EdgeTable = s.Pop()
         While s.Count() > 0
@@ -111,7 +142,8 @@
         End While
         Me.head = temp
         length = CountAET()
-        s.Clear()
+            s.Clear()
+        End If
     End Sub
 
     Public Function CountAET()

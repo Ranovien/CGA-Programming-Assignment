@@ -1,8 +1,8 @@
 ﻿Module MainModule
 
-    Dim edgetable As List(Of EdgeTable)
+    Dim edgetable As New List(Of EdgeTable)
     'The SET table
-    Dim AET As AEL
+    Dim AET As New AEL
     'The AEL 
     Dim stacker As New Stack(Of EdgeTable)
 
@@ -10,10 +10,11 @@
         'Fill the edge table
         FillSET(a) ' no bug
         'Set new AET
-        displaySET(edgetable)
+        'displaySET(edgetable)
         AET = New AEL
         'Tranverse the AET
         ProcessAET(g, pen)
+        edgetable = New List(Of EdgeTable)
     End Sub
 
     Public Sub FillSET(a As Tpolygon)
@@ -44,6 +45,7 @@
                     temp.dx = a.vertices(d).X - a.vertices(i).X
                     temp.dy = a.vertices(d).Y - a.vertices(i).Y
                     temp.carry = 0
+                    temp.nxt = Nothing
                     If temp.dy < 0 Then
                         temp.dy = -temp.dy
                         temp.dx = -temp.dx
@@ -64,19 +66,19 @@
             'assign the temporary variable to save the current data 
             current = edgetable(i)
             'delete the single expired
-            If i > 0 Then CheckSingleExpired(i)
+            If i > 0 Then AET.single_expired(i)
             'insert the new edges (sorted)
-            If current IsNot Nothing Then
-                For j As Integer = 0 To CountEdge(current) - 1
-                    AET.add(current)
-                    current = current.nxt
-                Next
-            End If
+            While Not (current Is Nothing)
+                AET.add(current)
+                'MsgBox("break")
+                current = current.nxt
+            End While
 
             'draw lines (don't forget about the normalization)
             drawlines(i, g, pen)
             'delete the double expired
             'CheckDoubleExpired() 'cause bug
+            If i > 0 Then AET.double_expired(i)
             'update 
             updateAET()
             'sort
@@ -94,13 +96,13 @@
     End Sub
 
     Public Sub drawlines(y As Integer, ByRef g As Graphics, pen As Pen)
-        If (AET.CountAET() > 1) Then
+        If (AET.length > 1) Then
             Dim data As EdgeTable = AET.head
             Dim data2 As EdgeTable = data.nxt
-            While True
+            While Not (data Is Nothing Or data2 Is Nothing)
                 g.DrawLine(pen, data.xmin, y + data.normalize, data2.xmin, y + data2.normalize)
-                data = data.nxt
-                If data.nxt IsNot Nothing Then
+                data = data.nxt.nxt
+                If Not (data Is Nothing) Then
                     data2 = data.nxt
                 Else
                     Exit While
@@ -119,7 +121,7 @@
         Dim counter As Integer = 1
         If (AET.CountAET() > 0) Then
             Dim currentdata As EdgeTable = AET.head
-            While currentdata IsNot Nothing
+            While Not (currentdata Is Nothing)
                 If (currentdata.ymax - currentdata.normalize) = y Then
                     'delete node
                     AET.remove(counter)
@@ -267,6 +269,7 @@
             temp = prevtemp
         End While
         target = temp
+        s.Clear()
     End Sub
 
     Public Sub resizeArray(a As List(Of EdgeTable), size As Integer)

@@ -39,6 +39,6 @@
         Me.dy = temp.dy
         Me.carry = temp.carry
         Me.normalize = temp.normalize
-        nxt = temp.nxt
+        nxt = Nothing
     End Sub
 End Class
