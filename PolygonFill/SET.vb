@@ -7,7 +7,7 @@
     Public carry As Integer
     Public normalize As Integer
     Public nxt As EdgeTable
-
+    'by kevin
     Public Sub New()
         ymin = Nothing
         ymax = Nothing
@@ -29,5 +29,16 @@
         Me.carry = carry
         Me.normalize = normalize
         nxt = Nothing
+    End Sub
+    'by kevin
+    Public Sub New(temp As EdgeTable)
+        Me.ymin = temp.ymin
+        Me.ymax = temp.ymax
+        Me.xmin = temp.xmin
+        Me.dx = temp.dx
+        Me.dy = temp.dy
+        Me.carry = temp.carry
+        Me.normalize = temp.normalize
+        nxt = temp.nxt
     End Sub
 End Class

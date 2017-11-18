@@ -10,6 +10,7 @@
         'Fill the edge table
         FillSET(a) ' no bug
         'Set new AET
+        displaySET(edgetable)
         AET = New AEL
         'Tranverse the AET
         ProcessAET(g, pen)
@@ -65,14 +66,17 @@
             'delete the single expired
             If i > 0 Then CheckSingleExpired(i)
             'insert the new edges (sorted)
-            While Not (current Is Nothing)
-                InsertEdgesToAET(current)
-                current = current.nxt
-            End While
+            If current IsNot Nothing Then
+                For j As Integer = 0 To CountEdge(current) - 1
+                    AET.add(current)
+                    current = current.nxt
+                Next
+            End If
+
             'draw lines (don't forget about the normalization)
             drawlines(i, g, pen)
             'delete the double expired
-            CheckDoubleExpired() 'cause bug
+            'CheckDoubleExpired() 'cause bug
             'update 
             updateAET()
             'sort
@@ -82,100 +86,24 @@
     End Sub
 
     Public Sub updateAET()
-        If (AET.length > 0) Then
-            stacker.Clear()
-            Dim temp As EdgeTable = Nothing
-            Dim data As EdgeTable = AET.head
-            While Not (data Is Nothing)
-                'Update the data
-                data.carry = data.carry + data.dx
-                If (data.dx < 0) Then
-                    While (-(data.carry + data.carry) >= data.dy)
-                        data.carry = data.carry + data.dy
-                        data.xmin = data.xmin - 1
-                    End While
-                Else
-                    While ((data.carry + data.carry) >= data.dy)
-                        data.carry = data.carry - data.dy
-                        data.xmin = data.xmin + 1
-                    End While
-                End If
-                stacker.Push(data)
-                data = data.nxt
-            End While
-            refillAET(stacker, temp)
-            AET.head = temp
-        End If
+        AET.update()
     End Sub
-
 
     Public Sub sortAET()
-        Dim temp As EdgeTable = Nothing
-        'create new container
-        Dim data As EdgeTable = AET
-        While Not (data Is Nothing)
-            sortedInsertion(temp, data)
-            data = data.nxt
-        End While
-        AET = temp
-        'replace AET with new one
-    End Sub
-
-    Public Sub sortAETStackVersion()
-        'this process uses stack
-        If Not (CountAET() = 0) Then
-            Dim data As EdgeTable = AET
-            Dim nextdata As EdgeTable = AET.nxt
-            While Not (data Is Nothing)
-                If data.xmin < nextdata.xmin Then
-                    stacker.Push(data)
-                    If nextdata.nxt Is Nothing Then
-                        stacker.Push(nextdata)
-                    Else
-                        data = data.nxt
-                        nextdata = nextdata.nxt
-                    End If
-                ElseIf data.xmin > nextdata.xmin Then
-                    stacker.Push(nextdata)
-                    If nextdata.nxt Is Nothing Then
-                        stacker.Push(data)
-                    Else
-                        nextdata = nextdata.nxt
-                    End If
-                Else
-                    If (data.dx / data.dy) <= (nextdata.dx / nextdata.dy) Then
-                        stacker.Push(data)
-                        If nextdata.nxt Is Nothing Then
-                            stacker.Push(nextdata)
-                        Else
-                            data = data.nxt
-                            nextdata = nextdata.nxt
-                        End If
-                    Else
-                        stacker.Push(nextdata)
-                        If nextdata.nxt Is Nothing Then
-                            stacker.Push(data)
-                        Else
-                            nextdata = nextdata.nxt
-                        End If
-                    End If
-                End If
-            End While
-            refillAET(stacker, AET)
-            'replace AET with new one
-            stacker.Clear()
-        End If
+        AET.sorted()
     End Sub
 
     Public Sub drawlines(y As Integer, ByRef g As Graphics, pen As Pen)
-        If (CountAET() >= 2) Then
+        If (AET.CountAET() > 1) Then
             Dim data As EdgeTable = AET.head
             Dim data2 As EdgeTable = data.nxt
-            While Not (data Is Nothing Or data2 Is Nothing)
+            While True
                 g.DrawLine(pen, data.xmin, y + data.normalize, data2.xmin, y + data2.normalize)
-                data = data.nxt.nxt
-                If Not (data Is Nothing) Then
+                data = data.nxt
+                If data.nxt IsNot Nothing Then
                     data2 = data.nxt
+                Else
+                    Exit While
                 End If
             End While
         End If
@@ -183,53 +111,34 @@
 
     Public Sub InsertEdgesToAET(data As EdgeTable)
         'Check the scanline, if there is new edge, insert it
-        AET.add(data.ymin, data.ymax, data.xmin, data.dx, data.dy, data.normalize, data.carry)
+        AET.add(data)
     End Sub
 
     Public Sub CheckSingleExpired(y As Integer)
-        'create new container
-        If (AET.length > 0) Then
-            Dim data As EdgeTable = AET.head
-            While Not (data Is Nothing)
-                If (data.ymax - data.normalize) = y Then
+        'create a counter
+        Dim counter As Integer = 1
+        If (AET.CountAET() > 0) Then
+            Dim currentdata As EdgeTable = AET.head
+            While currentdata IsNot Nothing
+                If (currentdata.ymax - currentdata.normalize) = y Then
                     'delete node
-                    AET.remove()
-                    data = data.nxt
+                    AET.remove(counter)
+                    currentdata = currentdata.nxt
                 Else
-                    data = data.nxt
+                    counter += 1
+                    currentdata = currentdata.nxt
                 End If
             End While
         End If
-        AET = temp
         'replace AET with new one
-    End Sub
-
-    Public Sub CheckSingleExpiredStackVersion(y As Integer)
-        'This process uses stack 
-        If (CountAET() >= 1) Then
-            stacker.Clear()
-            Dim data As EdgeTable = AET
-            While Not (data Is Nothing)
-                If (data.ymax - data.normalize) = y Then
-                    'delete node by ignoring it
-                    data = data.nxt
-                Else
-                    stacker.Push(data)
-                    data = data.nxt
-                End If
-            End While
-            refillAET(stacker, AET)
-            'replace AET with new one
-            stacker.Clear()
-        End If
     End Sub
 
     Public Sub CheckDoubleExpired()
         'create new container
         Dim temp As EdgeTable = Nothing
-        If (CountAET() > 1) Then
-            Dim data As EdgeTable = AET
-            Dim data2 As EdgeTable = AET.nxt
+        If (AET.CountAET() > 1) Then
+            Dim data As EdgeTable = AET.head
+            Dim data2 As EdgeTable = data.nxt
             While Not (data Is Nothing Or data2 Is Nothing)
                 If (data.xmin = data2.xmin) And (data.carry = 0) And (data2.carry = 0) Then
                     'delete node by ignoring it
@@ -247,38 +156,9 @@
                 End If
             End While
         End If
-        AET = temp
         'replace AET with new one
     End Sub
 
-    Public Sub CheckDoubleExpiredStackVersion()
-        'this process uses stack
-        If (CountAET() >= 2) Then
-            stacker.Clear()
-            Dim data As EdgeTable = AET
-            Dim data2 As EdgeTable = AET.nxt
-            While Not (data Is Nothing Or data2 Is Nothing)
-                If (data.xmin = data2.xmin) And (data.carry = 0) And (data2.carry = 0) Then
-                    'delete node by ignoring it
-                    data = data.nxt.nxt
-                    If Not (data Is Nothing) Then
-                        data2 = data.nxt
-                    End If
-                Else
-                    stacker.Push(data)
-                    stacker.Push(data2)
-                    data = data.nxt.nxt
-                    If Not (data Is Nothing) Then
-                        data2 = data.nxt
-                    End If
-                End If
-            End While
-            refillAET(stacker, AET)
-            'replace AET with new one
-            stacker.Clear()
-        End If
-
-    End Sub
 
     Public Sub sortedInsertion(ByRef target As EdgeTable, temp As EdgeTable)
         If target Is Nothing Then
@@ -455,13 +335,14 @@
         Return max
     End Function
 
-    Public Function CountAET()
-        Dim i = 0
-        Dim node = AET
+    Public Function CountEdge(head As EdgeTable)
+        Dim i As Integer = 0
+        Dim node As EdgeTable = head
         While Not (node Is Nothing)
             i = i + 1
             node = node.nxt
         End While
         Return i
     End Function
+
 End Module
