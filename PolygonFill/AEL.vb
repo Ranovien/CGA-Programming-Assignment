@@ -8,7 +8,7 @@
     Public Sub New()
         head = Nothing
         length = 0
-        Me.s = New Stack(Of EdgeTable)
+        s.Clear()
     End Sub
 
     Public Sub add(tempdata As EdgeTable)
@@ -40,25 +40,29 @@
 
     Public Sub remove(position As Integer)
         Dim currentNode As EdgeTable = Me.head
-        Dim length As Integer = Me.length,
-            counter As Integer = 0,
-            previous As EdgeTable = Nothing
+        Dim length As Integer = Me.length
+        Dim counter As Integer = 0
+        Dim previous As EdgeTable = Nothing
 
         ' an invalid position
-
+        If position < 1 OrElse position > length Then
+            MsgBox("Out of index in removing node")
+        End If
         ' the first node is removed
         If position = 1 Then
             Me.head = currentNode.nxt
-            Me.length -= 1
+            Me.length = Me.length - 1
         Else
             ' any other node is removed
             For i As Integer = 1 To position - 1
                 s.Push(currentNode)
                 currentNode = currentNode.nxt
             Next
+
             If Not (currentNode.nxt Is Nothing) Then
                 s.Push(currentNode.nxt)
             End If
+
             refillAET()
         End If
     End Sub
@@ -95,13 +99,14 @@
             Me.add(currentNode)
             currentNode = currentNode.nxt
         End While
+
     End Sub
 
     Public Sub single_expired(i As Integer)
         If length > 0 Then
             Dim currentNode As EdgeTable = Me.head
             While Not (currentNode Is Nothing)
-                If (currentNode.ymax - currentNode.normalize) = i Then
+                If currentNode.ymax = (i + currentNode.normalize) Then
                     'ignore
                 Else
                     s.Push(currentNode)
@@ -118,7 +123,8 @@
             Dim nextnode As EdgeTable = currentNode.nxt
             While Not (currentNode Is Nothing)
                 If (currentNode.xmin = nextnode.xmin) AndAlso currentNode.carry = nextnode.carry = 0 Then
-                    If (Not ((currentNode.ymin - currentNode.normalize) = i)) And Not ((nextnode.ymin - nextnode.normalize) = i) Then
+                    If ((currentNode.ymax - currentNode.normalize) = i - 1) And ((nextnode.ymax - nextnode.normalize) = i - 1) Then
+                        MsgBox("tereerere te te tet teret")
                         'ignore
                     End If
                 Else
@@ -133,15 +139,15 @@
     Private Sub refillAET()
         If Not (s.Count = 0) Then
             Me.head = Nothing
-        Dim prevtemp As New EdgeTable
-        Dim temp As EdgeTable = s.Pop()
-        While s.Count() > 0
-            prevtemp = s.Pop()
-            prevtemp.nxt = temp
-            temp = prevtemp
-        End While
-        Me.head = temp
-        length = CountAET()
+            Dim prevtemp As New EdgeTable
+            Dim temp As EdgeTable = s.Pop()
+            While s.Count() > 0
+                prevtemp = s.Pop()
+                prevtemp.nxt = temp
+                temp = prevtemp
+            End While
+            Me.head = temp
+            length = CountAET()
             s.Clear()
         End If
     End Sub

@@ -7,6 +7,8 @@
     Dim stacker As New Stack(Of EdgeTable)
 
     Public Sub FillPolygon(a As Tpolygon, ByRef g As Graphics, pen As Pen)
+        edgetable.Clear()
+        stacker.Clear()
         'Fill the edge table
         FillSET(a) ' no bug
         'Set new AET
@@ -14,49 +16,48 @@
         AET = New AEL
         'Tranverse the AET
         ProcessAET(g, pen)
-        edgetable = New List(Of EdgeTable)
+
     End Sub
 
     Public Sub FillSET(a As Tpolygon)
         'filling the SET if the polygon is valid (doesn't cross)
-        If a.isAbleToFIlled Then
-            edgetable = New List(Of EdgeTable)
-            'get the min and max to know how index that is needed
-            Dim min As Integer = getMinimumY(a.vertices)
-            Dim max As Integer = getMaximumY(a.vertices)
-            Dim size As Integer = max - min + 1
-            resizeArray(edgetable, size)
-            'resize the array for the iteration in AEL, may cause problem
-            Dim d As Integer
-            'the increment
-            For i As Integer = 0 To a.size
-                d = i + 1
-                If i = a.size Then
-                    'if it's the last index, make the line with last point and start point
-                    d = 0
+
+        edgetable = New List(Of EdgeTable)
+        'get the min and max to know how index that is needed
+        Dim min As Integer = getMinimumY(a.vertices)
+        Dim max As Integer = getMaximumY(a.vertices)
+        Dim size As Integer = max - min + 1
+        resizeArray(edgetable, size)  'resize the array for the iteration in AEL, may cause problem
+        Dim d As Integer
+        'the increment
+        For i As Integer = 0 To a.size
+            d = i + 1
+            If i = a.size Then
+                'if it's the last index, make the line with last point and start point
+                d = 0
+            End If
+            If Not (a.vertices(i).Y = a.vertices(d).Y) Then
+                'If it Is Not horizontal line (a.vertices(i).Y = a.vertices(d).Y) Then fill all data 
+                Dim temp As New EdgeTable
+                temp.normalize = min
+                temp.ymin = If(a.vertices(i).Y <= a.vertices(d).Y, a.vertices(i).Y, a.vertices(d).Y)
+                temp.ymax = If(a.vertices(i).Y >= a.vertices(d).Y, a.vertices(i).Y, a.vertices(d).Y)
+                temp.xmin = If(a.vertices(i).Y <= a.vertices(d).Y, a.vertices(i).X, a.vertices(d).X)
+                temp.dx = a.vertices(d).X - a.vertices(i).X
+                temp.dy = a.vertices(d).Y - a.vertices(i).Y
+                temp.carry = 0
+                temp.nxt = Nothing
+                If temp.dy < 0 Then
+                    temp.dy = -temp.dy
+                    temp.dx = -temp.dx
                 End If
-                If Not (a.vertices(i).Y = a.vertices(d).Y) Then
-                    'If it Is Not horizontal line Then fill all data 
-                    Dim temp As New EdgeTable
-                    temp.normalize = min
-                    temp.ymin = If(a.vertices(i).Y <= a.vertices(d).Y, a.vertices(i).Y, a.vertices(d).Y)
-                    temp.ymax = If(a.vertices(i).Y >= a.vertices(d).Y, a.vertices(i).Y, a.vertices(d).Y)
-                    temp.xmin = If(a.vertices(i).Y <= a.vertices(d).Y, a.vertices(i).X, a.vertices(d).X)
-                    temp.dx = a.vertices(d).X - a.vertices(i).X
-                    temp.dy = a.vertices(d).Y - a.vertices(i).Y
-                    temp.carry = 0
-                    temp.nxt = Nothing
-                    If temp.dy < 0 Then
-                        temp.dy = -temp.dy
-                        temp.dx = -temp.dx
-                    End If
-                    'the data is filled
-                    Dim index As Integer = temp.ymin - min
-                    'normalize the index that will be use
-                    sortedInsertion(edgetable(index), temp)
-                End If
-            Next
-        End If
+                'the data is filled
+                Dim index As Integer = temp.ymin - min
+                'normalize the index that will be use
+                sortedInsertion(edgetable(index), temp)
+            End If
+        Next
+
     End Sub
 
     Public Sub ProcessAET(ByRef g As Graphics, pen As Pen)
@@ -72,8 +73,8 @@
                 AET.add(current)
                 'MsgBox("break")
                 current = current.nxt
+                'MsgBox(AET.length.ToString)
             End While
-
             'draw lines (don't forget about the normalization)
             drawlines(i, g, pen)
             'delete the double expired
@@ -96,18 +97,27 @@
     End Sub
 
     Public Sub drawlines(y As Integer, ByRef g As Graphics, pen As Pen)
-        If (AET.length > 1) Then
+        If AET.length > 0 Then
             Dim data As EdgeTable = AET.head
             Dim data2 As EdgeTable = data.nxt
+            Dim i As Integer = 0
             While Not (data Is Nothing Or data2 Is Nothing)
-                g.DrawLine(pen, data.xmin, y + data.normalize, data2.xmin, y + data2.normalize)
+                ' MsgBox(i.ToString + ": "+data.xmin.ToString + " " + data2.xmin.ToString)
+                If (data.xmin = data2.xmin) Then
+                    ' MsgBox("tereerere te te tet teret")
+                    'setpixel
+                Else
+                    g.DrawLine(pen, data.xmin, y + data.normalize, data2.xmin, y + data2.normalize)
+                End If
                 data = data.nxt.nxt
+                i = i + 1
                 If Not (data Is Nothing) Then
                     data2 = data.nxt
                 Else
                     Exit While
                 End If
             End While
+
         End If
     End Sub
 
@@ -116,19 +126,22 @@
         AET.add(data)
     End Sub
 
-    Public Sub CheckSingleExpired(y As Integer)
+    Public Sub CheckSingleExpired(currentdata As EdgeTable, y As Integer)
         'create a counter
         Dim counter As Integer = 1
         If (AET.CountAET() > 0) Then
-            Dim currentdata As EdgeTable = AET.head
             While Not (currentdata Is Nothing)
                 If (currentdata.ymax - currentdata.normalize) = y Then
                     'delete node
                     AET.remove(counter)
+                    counter = counter - 1
+                    currentdata = currentdata.nxt
+                End If
+                counter = counter + 1
+                If Not (currentdata.nxt Is Nothing) Then
                     currentdata = currentdata.nxt
                 Else
-                    counter += 1
-                    currentdata = currentdata.nxt
+                    Exit While
                 End If
             End While
         End If

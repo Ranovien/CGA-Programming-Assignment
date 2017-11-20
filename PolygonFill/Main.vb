@@ -151,20 +151,22 @@
     End Sub
 
     Private Sub UpdatePointList(sender As Object, e As EventArgs) Handles PolyList.SelectedIndexChanged
-        'activate the edit mode
-        editmode = True
-        editpointmode = False
-        addmode = False
-        btnEndEdit.Visible = True
-        btnEndEdit.Enabled = True
-        'Update the listbox for point of certain polygon
-        Dim temp(2) As String
-        temp = Split(PolyList.SelectedItem.ToString, " ")
-        selectedpoly = Val(temp(1))
-        PointList.Items.Clear()
-        For i As Integer = 0 To PolygonArray(selectedpoly).vertices.Count - 1
-            PointList.Items.Add("Point " + i.ToString)
-        Next
+        If PolyList.SelectedItem IsNot Nothing Then
+            'activate the edit mode
+            editmode = True
+            editpointmode = False
+            addmode = False
+            btnEndEdit.Visible = True
+            btnEndEdit.Enabled = True
+            'Update the listbox for point of certain polygon
+            Dim temp(2) As String
+            temp = Split(PolyList.SelectedItem.ToString, " ")
+            selectedpoly = Val(temp(1))
+            PointList.Items.Clear()
+            For i As Integer = 0 To PolygonArray(selectedpoly).vertices.Count - 1
+                PointList.Items.Add("Point " + i.ToString)
+            Next
+        End If
     End Sub
 
     Private Sub EditPointList(sender As Object, e As EventArgs) Handles PointList.SelectedIndexChanged
@@ -190,8 +192,10 @@
         For i As Integer = 0 To PolygonArray.Count - 1
             'DrawpolygonAlt(PolygonArray(i), g)
             If (PolygonArray(i).isfilled = True) Then
+                'If PolygonArray(i).isAbleToFIlled() = True Then
                 mypen = New Pen(PolygonArray(i).tcolor, 1)
                 FillPolygon(PolygonArray(i), g, mypen)
+                ' End If
             Else
                 PolygonArray(i).Drawpolygon(g)
             End If
