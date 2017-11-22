@@ -28,7 +28,7 @@
         Dim max As Integer = getMaximumY(a.vertices)
         Dim size As Integer = max - min + 1
         resizeArray(edgetable, size)  'resize the array for the iteration in AEL, may cause problem
-        Dim d As Integer
+        Dim d, horizon As Integer
         'the increment
         For i As Integer = 0 To a.size
             d = i + 1
@@ -36,6 +36,8 @@
                 'if it's the last index, make the line with last point and start point
                 d = 0
             End If
+            horizon = a.vertices(d).Y - a.vertices(i).Y
+            If horizon < 0 Then horizon = -(horizon)
             If Not (a.vertices(i).Y = a.vertices(d).Y) Then
                 'If it Is Not horizontal line (a.vertices(i).Y = a.vertices(d).Y) Then fill all data 
                 Dim temp As New EdgeTable
@@ -67,8 +69,9 @@
             'assign the temporary variable to save the current data 
             current = edgetable(i)
             'delete the single expired
-            If i > 0 Then AET.single_expired(i)
+            If i > 0 Then CheckSingleExpired(i)
             'insert the new edges (sorted)
+
             While Not (current Is Nothing)
                 AET.add(current)
                 'MsgBox("break")
@@ -79,11 +82,11 @@
             drawlines(i, g, pen)
             'delete the double expired
             'CheckDoubleExpired() 'cause bug
-            If i > 0 Then AET.double_expired(i)
+            ' If i > 0 Then AET.double_expired(i)
             'update 
-            updateAET()
+            AET.update()
             'sort
-            sortAET()
+            'AET.sorted()
             'sortAETStackVersion() ' is failed
         Next
     End Sub
@@ -104,9 +107,9 @@
             While Not (data Is Nothing Or data2 Is Nothing)
                 ' MsgBox(i.ToString + ": "+data.xmin.ToString + " " + data2.xmin.ToString)
                 If (data.xmin = data2.xmin) Then
-                    ' MsgBox("tereerere te te tet teret")
                     'setpixel
                 Else
+                    'MsgBox(AET.length.ToString + " -- " + (y + data.normalize).ToString)
                     g.DrawLine(pen, data.xmin, y + data.normalize, data2.xmin, y + data2.normalize)
                 End If
                 data = data.nxt.nxt
@@ -118,6 +121,7 @@
                 End If
             End While
 
+
         End If
     End Sub
 
@@ -126,24 +130,20 @@
         AET.add(data)
     End Sub
 
-    Public Sub CheckSingleExpired(currentdata As EdgeTable, y As Integer)
+    Public Sub CheckSingleExpired(y As Integer)
         'create a counter
-        Dim counter As Integer = 1
+        Dim currentdata As EdgeTable = AET.head
+        Dim counter As Integer = 0
         If (AET.CountAET() > 0) Then
             While Not (currentdata Is Nothing)
-                If (currentdata.ymax - currentdata.normalize) = y Then
+                If currentdata.ymax = y + currentdata.normalize Then
                     'delete node
                     AET.remove(counter)
                     counter = counter - 1
-                    currentdata = currentdata.nxt
                 End If
                 counter = counter + 1
-                If Not (currentdata.nxt Is Nothing) Then
-                    currentdata = currentdata.nxt
-                Else
-                    Exit While
-                End If
-            End While
+                currentdata = currentdata.nxt
+        End While
         End If
         'replace AET with new one
     End Sub

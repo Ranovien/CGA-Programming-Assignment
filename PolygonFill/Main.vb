@@ -170,19 +170,20 @@
     End Sub
 
     Private Sub EditPointList(sender As Object, e As EventArgs) Handles PointList.SelectedIndexChanged
-        'activate the edit mode
-        editmode = True
-        editpointmode = True
-        addmode = False
-        btnEndEdit.Visible = True
-        btnEndEdit.Enabled = True
-        'Able to edit the selected point of certain polygon
-        Dim temp(2) As String
-        temp = Split(PointList.SelectedItem.ToString, " ")
-        selectedpoint = Val(temp(1))
-        txteditX.Text = PolygonArray(selectedpoly).vertices(selectedpoint).X
-        txteditY.Text = PolygonArray(selectedpoly).vertices(selectedpoint).Y
-
+        If PointList.SelectedItem IsNot Nothing Then
+            'activate the edit mode
+            editmode = True
+            editpointmode = True
+            addmode = False
+            btnEndEdit.Visible = True
+            btnEndEdit.Enabled = True
+            'Able to edit the selected point of certain polygon
+            Dim temp(2) As String
+            temp = Split(PointList.SelectedItem.ToString, " ")
+            selectedpoint = Val(temp(1))
+            txteditX.Text = PolygonArray(selectedpoly).vertices(selectedpoint).X
+            txteditY.Text = PolygonArray(selectedpoly).vertices(selectedpoint).Y
+        End If
     End Sub
 
     Public Sub Display()
@@ -192,10 +193,8 @@
         For i As Integer = 0 To PolygonArray.Count - 1
             'DrawpolygonAlt(PolygonArray(i), g)
             If (PolygonArray(i).isfilled = True) Then
-                'If PolygonArray(i).isAbleToFIlled() = True Then
                 mypen = New Pen(PolygonArray(i).tcolor, 1)
                 FillPolygon(PolygonArray(i), g, mypen)
-                ' End If
             Else
                 PolygonArray(i).Drawpolygon(g)
             End If

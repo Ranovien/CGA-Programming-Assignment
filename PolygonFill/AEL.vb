@@ -4,11 +4,13 @@
     Public head As EdgeTable
     Public length As Integer
     Private s As New Stack(Of EdgeTable)
+    Private s2 As New Stack(Of EdgeTable)
 
     Public Sub New()
         head = Nothing
         length = 0
         s.Clear()
+        s2.Clear()
     End Sub
 
     Public Sub add(tempdata As EdgeTable)
@@ -38,33 +40,66 @@
         End If
     End Sub
 
+    Public Sub addonebyone(tempdata As EdgeTable)
+        Dim node As EdgeTable = New EdgeTable(tempdata)
+        Dim currentNode As EdgeTable = Me.head
+
+        ' an empty list
+        If currentNode Is Nothing Then
+            Me.head = node
+            Me.length = 1
+        Else
+            While Not (currentNode Is Nothing)
+                If node.xmin < currentNode.xmin OrElse (node.xmin = currentNode.xmin AndAlso node.dx / node.dy < currentNode.dx / currentNode.dy) Then
+                    s.Push(node)
+                    While Not (currentNode Is Nothing)
+                        s.Push(currentNode)
+                        currentNode = currentNode.nxt
+                    End While
+                    Exit While
+                Else
+                    s.Push(currentNode)
+                    If currentNode.nxt Is Nothing Then
+                        s.Push(node)
+                        Exit While
+                    End If
+                End If
+                currentNode = currentNode.nxt
+            End While
+            refillAET()
+        End If
+    End Sub
+
     Public Sub remove(position As Integer)
         Dim currentNode As EdgeTable = Me.head
-        Dim length As Integer = Me.length
+        Dim length As Integer = Me.length - 1
         Dim counter As Integer = 0
-        Dim previous As EdgeTable = Nothing
+        Dim temp As EdgeTable
 
         ' an invalid position
-        If position < 1 OrElse position > length Then
+        If position < 0 OrElse position > length Then
             MsgBox("Out of index in removing node")
         End If
         ' the first node is removed
-        If position = 1 Then
-            Me.head = currentNode.nxt
-            Me.length = Me.length - 1
+        If position = 0 Then
+            Me.head = Me.head.nxt
+
         Else
             ' any other node is removed
             For i As Integer = 1 To position - 1
-                s.Push(currentNode)
                 currentNode = currentNode.nxt
             Next
 
-            If Not (currentNode.nxt Is Nothing) Then
-                s.Push(currentNode.nxt)
+            If Not (currentNode.nxt.nxt Is Nothing) Then
+                temp = currentNode
+                temp.nxt = temp.nxt.nxt
+            Else
+                temp = currentNode
+                temp.nxt = Nothing
             End If
 
-            refillAET()
         End If
+        Me.length = Me.length - 1
     End Sub
 
     Public Sub update()
@@ -104,11 +139,14 @@
 
     Public Sub single_expired(i As Integer)
         If length > 0 Then
+            Dim temp As New EdgeTable
             Dim currentNode As EdgeTable = Me.head
             While Not (currentNode Is Nothing)
                 If currentNode.ymax = (i + currentNode.normalize) Then
                     'ignore
+                    MsgBox("ignore")
                 Else
+
                     s.Push(currentNode)
                 End If
                 currentNode = currentNode.nxt
@@ -139,16 +177,36 @@
     Private Sub refillAET()
         If Not (s.Count = 0) Then
             Me.head = Nothing
-            Dim prevtemp As New EdgeTable
+            Dim prevtemp As EdgeTable
             Dim temp As EdgeTable = s.Pop()
-            While s.Count() > 0
+            While Not (s.Count() = 0)
                 prevtemp = s.Pop()
+                'prevtemp.nxt = Nothing
                 prevtemp.nxt = temp
                 temp = prevtemp
             End While
             Me.head = temp
             length = CountAET()
             s.Clear()
+        End If
+    End Sub
+
+    Private Sub fillthetail(ByRef data As EdgeTable)
+        Dim temp As EdgeTable = data
+        While Not (temp Is Nothing)
+            s2.Push(temp)
+            temp = temp.nxt
+        End While
+        If Not (s2.Count = 0) Then
+            temp = Nothing
+            Dim prevtemp As EdgeTable
+            temp = s2.Pop()
+            temp.nxt = Nothing
+            While Not (s2.Count() = 0)
+                prevtemp = s2.Pop()
+                prevtemp.nxt = temp
+                temp = prevtemp
+            End While
         End If
     End Sub
 
