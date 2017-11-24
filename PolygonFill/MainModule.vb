@@ -86,7 +86,7 @@
             'update 
             AET.update()
             'sort
-            'AET.sorted()
+            AET.sorted()
             'sortAETStackVersion() ' is failed
         Next
     End Sub

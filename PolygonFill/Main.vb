@@ -9,6 +9,7 @@
     Dim bit As Bitmap
     Dim g As Graphics
     Dim mypen As Pen
+    Dim origincolor As Color
     'Save location
     Dim FILE_PATH As String = IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "file")
     Dim FILE_NAME As String = IO.Path.Combine(FILE_PATH, "file1.txt")
@@ -24,6 +25,7 @@
         editmode = False
         editpointmode = False
         addmode = False
+        origincolor = btnAdd.BackColor
     End Sub
 
     Private Sub MouseMovement(sender As Object, e As MouseEventArgs) Handles PictureBox.MouseMove
@@ -61,7 +63,7 @@
                     Next
                 End If
                 Display()
-                TerminateEditMode()
+                'TerminateEditMode()
             End If
         End If
     End Sub
@@ -102,7 +104,7 @@
         Else
             PolygonArray(selectedpoly).ChangeFillStatus()
             Display()
-            TerminateEditMode()
+            'TerminateEditMode()
         End If
     End Sub
 
@@ -110,7 +112,7 @@
         If editmode = True Then
             PolygonArray.RemoveAt(selectedpoly)
             Display()
-            TerminateEditMode()
+            'TerminateEditMode()
             'Update the listbox
             PolyList.Items.Clear()
             For i As Integer = 0 To PolygonArray.Count - 1
@@ -133,7 +135,7 @@
                     PointList.Items.Add("Point " + i.ToString)
                 Next
                 Display()
-                TerminateEditMode()
+                'TerminateEditMode()
             Else
                 MsgBox("The polygon has only 3 Vertex!!")
             End If
@@ -186,6 +188,30 @@
         End If
     End Sub
 
+    Private Sub BringFront(sender As Object, e As EventArgs) Handles btnFront.Click
+        If (editmode = True) Then
+            Dim temp As Tpolygon = PolygonArray(selectedpoly)
+            PolygonArray.RemoveAt(selectedpoly)
+            PolygonArray.Add(temp)
+            PointList.Items.Clear()
+            Display()
+        Else
+            MsgBox("Enter the edit mode!")
+        End If
+    End Sub
+
+    Private Sub BringBack(sender As Object, e As EventArgs) Handles btnBack.Click
+        If (editmode = True) Then
+            Dim temp As Tpolygon = PolygonArray(selectedpoly)
+            PolygonArray.RemoveAt(selectedpoly)
+            PolygonArray.Insert(0, temp)
+            PointList.Items.Clear()
+            Display()
+        Else
+            MsgBox("Enter the edit mode!")
+        End If
+    End Sub
+
     Public Sub Display()
         'Display the polygon
         'clear first
@@ -216,10 +242,19 @@
     End Sub
 
     Private Sub EnableAddMode(sender As Object, e As EventArgs) Handles btnAdd.Click
-        If editmode = True And editpointmode = True Then
-            addmode = True
+        If editmode = True Then
+            If editpointmode = True Then
+                If addmode = False Then
+                    addmode = True
+                    btnAdd.BackColor = Color.Blue
+                Else
+                    addmode = False
+                    editpointmode = False
+                    btnAdd.BackColor = origincolor
+                End If
+            End If
         Else
-            MsgBox("Enter the edit mode first by clicking the point listbox!!")
+                MsgBox("Enter the edit mode first by clicking the point listbox!!")
         End If
     End Sub
 
@@ -236,7 +271,7 @@
             If (cDialog.ShowDialog() = DialogResult.OK) Then
                 PolygonArray(selectedpoly).ChangeColor(cDialog.Color)
                 Display()
-                TerminateEditMode()
+                'TerminateEditMode()
             End If
         End If
     End Sub

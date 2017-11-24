@@ -43,6 +43,8 @@ Partial Class Main
         Me.lblColor = New System.Windows.Forms.Label()
         Me.lblToggle = New System.Windows.Forms.Label()
         Me.btnEndEdit = New System.Windows.Forms.Button()
+        Me.btnFront = New System.Windows.Forms.Button()
+        Me.btnBack = New System.Windows.Forms.Button()
         CType(Me.PictureBox, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
@@ -75,18 +77,18 @@ Partial Class Main
         '
         'txteditX
         '
-        Me.txteditX.Location = New System.Drawing.Point(933, 323)
+        Me.txteditX.Location = New System.Drawing.Point(1044, 322)
         Me.txteditX.Name = "txteditX"
         Me.txteditX.ReadOnly = True
-        Me.txteditX.Size = New System.Drawing.Size(128, 26)
+        Me.txteditX.Size = New System.Drawing.Size(70, 26)
         Me.txteditX.TabIndex = 3
         '
         'txteditY
         '
-        Me.txteditY.Location = New System.Drawing.Point(933, 355)
+        Me.txteditY.Location = New System.Drawing.Point(1044, 354)
         Me.txteditY.Name = "txteditY"
         Me.txteditY.ReadOnly = True
-        Me.txteditY.Size = New System.Drawing.Size(128, 26)
+        Me.txteditY.Size = New System.Drawing.Size(70, 26)
         Me.txteditY.TabIndex = 4
         '
         'btndelpoly
@@ -100,12 +102,13 @@ Partial Class Main
         '
         'btnAdd
         '
-        Me.btnAdd.Location = New System.Drawing.Point(834, 323)
+        Me.btnAdd.BackColor = System.Drawing.Color.FromArgb(CType(CType(224, Byte), Integer), CType(CType(224, Byte), Integer), CType(CType(224, Byte), Integer))
+        Me.btnAdd.Location = New System.Drawing.Point(943, 325)
         Me.btnAdd.Name = "btnAdd"
         Me.btnAdd.Size = New System.Drawing.Size(58, 58)
         Me.btnAdd.TabIndex = 6
         Me.btnAdd.Text = "Add"
-        Me.btnAdd.UseVisualStyleBackColor = True
+        Me.btnAdd.UseVisualStyleBackColor = False
         '
         'btndelpoint
         '
@@ -119,7 +122,7 @@ Partial Class Main
         'lblXEdit
         '
         Me.lblXEdit.AutoSize = True
-        Me.lblXEdit.Location = New System.Drawing.Point(899, 328)
+        Me.lblXEdit.Location = New System.Drawing.Point(1007, 325)
         Me.lblXEdit.Name = "lblXEdit"
         Me.lblXEdit.Size = New System.Drawing.Size(28, 20)
         Me.lblXEdit.TabIndex = 8
@@ -128,7 +131,7 @@ Partial Class Main
         'lblYEdit
         '
         Me.lblYEdit.AutoSize = True
-        Me.lblYEdit.Location = New System.Drawing.Point(899, 358)
+        Me.lblYEdit.Location = New System.Drawing.Point(1007, 357)
         Me.lblYEdit.Name = "lblYEdit"
         Me.lblYEdit.Size = New System.Drawing.Size(28, 20)
         Me.lblYEdit.TabIndex = 9
@@ -238,11 +241,31 @@ Partial Class Main
         Me.btnEndEdit.UseVisualStyleBackColor = True
         Me.btnEndEdit.Visible = False
         '
+        'btnFront
+        '
+        Me.btnFront.Location = New System.Drawing.Point(834, 324)
+        Me.btnFront.Name = "btnFront"
+        Me.btnFront.Size = New System.Drawing.Size(99, 30)
+        Me.btnFront.TabIndex = 21
+        Me.btnFront.Text = "To Front"
+        Me.btnFront.UseVisualStyleBackColor = True
+        '
+        'btnBack
+        '
+        Me.btnBack.Location = New System.Drawing.Point(834, 360)
+        Me.btnBack.Name = "btnBack"
+        Me.btnBack.Size = New System.Drawing.Size(99, 30)
+        Me.btnBack.TabIndex = 22
+        Me.btnBack.Text = "To Back"
+        Me.btnBack.UseVisualStyleBackColor = True
+        '
         'Main
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(1126, 570)
+        Me.Controls.Add(Me.btnBack)
+        Me.Controls.Add(Me.btnFront)
         Me.Controls.Add(Me.btnEndEdit)
         Me.Controls.Add(Me.lblToggle)
         Me.Controls.Add(Me.lblColor)
@@ -293,4 +316,6 @@ Partial Class Main
     Friend WithEvents lblColor As Label
     Friend WithEvents lblToggle As Label
     Friend WithEvents btnEndEdit As Button
+    Friend WithEvents btnFront As Button
+    Friend WithEvents btnBack As Button
 End Class

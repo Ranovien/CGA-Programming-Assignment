@@ -13,7 +13,7 @@
         s2.Clear()
     End Sub
 
-    Public Sub add(tempdata As EdgeTable)
+    Public Sub Add(tempdata As EdgeTable)
         Dim node As EdgeTable = New EdgeTable(tempdata)
         Dim currentNode As EdgeTable = Me.head
 
@@ -36,11 +36,11 @@
                 End If
                 currentNode = currentNode.nxt
             End While
-            refillAET()
+            RefillAET()
         End If
     End Sub
 
-    Public Sub addonebyone(tempdata As EdgeTable)
+    Public Sub Addonebyone(tempdata As EdgeTable)
         Dim node As EdgeTable = New EdgeTable(tempdata)
         Dim currentNode As EdgeTable = Me.head
 
@@ -66,11 +66,11 @@
                 End If
                 currentNode = currentNode.nxt
             End While
-            refillAET()
+            RefillAET()
         End If
     End Sub
 
-    Public Sub remove(position As Integer)
+    Public Sub Remove(position As Integer)
         Dim currentNode As EdgeTable = Me.head
         Dim length As Integer = Me.length - 1
         Dim counter As Integer = 0
@@ -102,7 +102,7 @@
         Me.length = Me.length - 1
     End Sub
 
-    Public Sub update()
+    Public Sub Update()
         'by created by kevin
         If length > 0 Then
             Dim currentNode As EdgeTable = Me.head
@@ -123,11 +123,11 @@
                 s.Push(currentNode)
                 currentNode = currentNode.nxt
             End While
-            refillAET()
+            RefillAET()
         End If
     End Sub
 
-    Public Sub sorted()
+    Public Sub Sorted()
         Dim currentNode As EdgeTable = Me.head
         Me.head = Nothing
         While Not (currentNode Is Nothing)
@@ -137,7 +137,7 @@
 
     End Sub
 
-    Public Sub single_expired(i As Integer)
+    Public Sub Single_expired(i As Integer)
         If length > 0 Then
             Dim temp As New EdgeTable
             Dim currentNode As EdgeTable = Me.head
@@ -151,11 +151,11 @@
                 End If
                 currentNode = currentNode.nxt
             End While
-            refillAET()
+            RefillAET()
         End If
     End Sub
 
-    Public Sub double_expired(i As Integer)
+    Public Sub Double_expired(i As Integer)
         If length > 1 Then
             Dim currentNode As EdgeTable = Me.head
             Dim nextnode As EdgeTable = currentNode.nxt
@@ -170,11 +170,11 @@
                 End If
                 currentNode = currentNode.nxt
             End While
-            refillAET()
+            RefillAET()
         End If
     End Sub
 
-    Private Sub refillAET()
+    Private Sub RefillAET()
         If Not (s.Count = 0) Then
             Me.head = Nothing
             Dim prevtemp As EdgeTable
@@ -188,25 +188,6 @@
             Me.head = temp
             length = CountAET()
             s.Clear()
-        End If
-    End Sub
-
-    Private Sub fillthetail(ByRef data As EdgeTable)
-        Dim temp As EdgeTable = data
-        While Not (temp Is Nothing)
-            s2.Push(temp)
-            temp = temp.nxt
-        End While
-        If Not (s2.Count = 0) Then
-            temp = Nothing
-            Dim prevtemp As EdgeTable
-            temp = s2.Pop()
-            temp.nxt = Nothing
-            While Not (s2.Count() = 0)
-                prevtemp = s2.Pop()
-                prevtemp.nxt = temp
-                temp = prevtemp
-            End While
         End If
     End Sub
 
