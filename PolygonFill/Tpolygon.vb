@@ -3,37 +3,20 @@
     Public tcolor As Color ' color for filling
     Public isfilled As Boolean 'status of polygon
     Public size As Integer ' size of array
-    Public canbefilled As Boolean ' check if the polygon is crossed or not
 
     Public Sub New() ' constructor
         vertices = New List(Of Point)
         tcolor = Color.Blue
         isfilled = False
         size = -1
-        canbefilled = True
     End Sub
 
-    Public Function IsnotAbleToFIlled() As Boolean
-        'Check if the polygon can be filled or not
-        'Inside outside?
-        'by Handy
-        Dim verticesLength As Integer = size - 1, intersection As Double, t As Double
-        For i As Integer = 0 To verticesLength
-            For j As Integer = i + 1 To verticesLength
-                intersection = XIntersection(vertices(i).X, vertices(i).Y, vertices((i + 1) Mod verticesLength).X, vertices((i + 1) Mod verticesLength).Y, vertices(j).X, vertices(j).Y, vertices((j + 1) Mod verticesLength).X, vertices((j + 1) Mod verticesLength).Y)
-                t = (intersection - vertices(i).X) / (vertices((i + 1) Mod verticesLength).X - vertices(i).X)
-                If (0 < t And t < 1) Then
-                    t = (intersection - vertices(j).X) / (vertices((j + 1) Mod verticesLength).X - vertices(j).X)
-                    If (0 < t And t < 1) Then
-                        canbefilled = False
-                        Return canbefilled
-                    End If
-                End If
-            Next
-        Next
-        canbefilled = True
-        Return canbefilled
-    End Function
+    Public Sub New(tcolor As Integer, isfilled As String) ' constructor
+        vertices = New List(Of Point)
+        Me.tcolor = Color.FromArgb(tcolor)
+        Me.isfilled = Convert.ToBoolean(isfilled)
+        Me.size = -1
+    End Sub
 
     Public Function isPolygon()
         Return (size > 1)
@@ -68,10 +51,4 @@
         pen.Dispose()
     End Sub
 
-    Private Function XIntersection(x1 As Integer, y1 As Integer, x2 As Integer, y2 As Integer, x3 As Integer, y3 As Integer, x4 As Integer, y4 As Integer) As Double ' only need either x-intersection Or y-intersection To find the t
-        'by Handy
-        Dim num As Integer = (x1 * y2 - y1 * x2) * (x3 - x4) - (x1 - x2) * (x3 * y4 - y3 * x4),
-        den As Integer = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4)
-        Return num / den
-    End Function
 End Class

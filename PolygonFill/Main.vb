@@ -212,6 +212,69 @@
         End If
     End Sub
 
+    Private Sub btnSave_Click(sender As Object, e As EventArgs) Handles btnSave.Click
+        System.IO.File.WriteAllText(FILE_NAME, "")
+        Dim objWriter As New System.IO.StreamWriter(FILE_NAME)
+        If (PolygonArray.Count() > 0) Then
+            objWriter.Write("polygon ")
+            objWriter.Write(Environment.NewLine)
+            For i As Integer = 0 To PolygonArray.Count() - 1
+                'MsgBox(PolygonArray(i).tcolor.ToArgb.ToString)
+                objWriter.Write(PolygonArray(i).tcolor.ToArgb.ToString + " " + PolygonArray(i).isfilled.ToString + " ")
+                objWriter.Write("vertices ")
+                For j As Integer = 0 To PolygonArray(i).vertices.Count - 1
+                    objWriter.Write(PolygonArray(i).vertices(j).X.ToString + " " + PolygonArray(i).vertices(j).Y.ToString + " ")
+                Next
+                objWriter.Write("end")
+                If Not (i = PolygonArray.Count - 1) Then
+                    objWriter.Write(" ")
+                End If
+            Next
+        End If
+        objWriter.Close()
+    End Sub
+
+    Private Sub btnLoad_Click(sender As Object, e As EventArgs) Handles btnLoad.Click
+        PolygonArray.Clear()
+        PolyList.Items.Clear()
+        PointList.Items.Clear()
+        fileReader = My.Computer.FileSystem.ReadAllText(FILE_NAME)
+        Dim loadvertice As Boolean = False
+        Dim file As String() = fileReader.Split(" ")
+        Dim datacount As Integer = 0
+        Dim arrayofpoly As Integer = -1
+        If file(0) = "polygon" Then
+            For i As Integer = 1 To file.Length - 1
+                If file(i) = "vertices" Then
+                    loadvertice = True
+                ElseIf file(i) = "end" Then
+                    If loadvertice = True Then
+                        loadvertice = False
+                    End If
+                Else
+                    If (loadvertice = True) Then
+                        datacount += 1
+                        If datacount = 2 Then
+                            datacount = 0
+                            Dim temppoint As New Point(file(i - 1), file(i))
+                            PolygonArray(arrayofpoly).InputVertex(temppoint)
+                        End If
+                    Else
+                        datacount += 1
+                        If datacount = 2 Then
+                            datacount = 0
+                            arrayofpoly += 1
+                            Dim tempdata As New Tpolygon(file(i - 1), file(i))
+                            PolygonArray.Add(tempdata)
+                        End If
+                    End If
+                End If
+            Next
+        End If
+        UpdatePolyList()
+        Display()
+    End Sub
+
     Public Sub Display()
         'Display the polygon
         'clear first
