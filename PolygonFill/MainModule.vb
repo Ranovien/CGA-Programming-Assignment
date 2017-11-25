@@ -6,7 +6,7 @@
     'The AEL 
     Dim stacker As New Stack(Of EdgeTable)
 
-    Public Sub FillPolygon(a As Tpolygon, ByRef g As Graphics, pen As Pen)
+    Public Sub FillPolygon(a As Tpolygon, ByRef g As Graphics, ByRef bmp As Bitmap, pen As Pen)
         edgetable.Clear()
         stacker.Clear()
         'Fill the edge table
@@ -15,7 +15,7 @@
         'displaySET(edgetable)
         AET = New AEL
         'Tranverse the AET
-        ProcessAET(g, pen)
+        ProcessAET(g, bmp, pen)
 
     End Sub
 
@@ -62,7 +62,7 @@
 
     End Sub
 
-    Public Sub ProcessAET(ByRef g As Graphics, pen As Pen)
+    Public Sub ProcessAET(ByRef g As Graphics, ByRef bmp As Bitmap, pen As Pen)
         'Loop from index 0 to Max
         Dim current As EdgeTable
         For i As Integer = 0 To edgetable.Count - 1
@@ -73,20 +73,20 @@
             'insert the new edges (sorted)
 
             While Not (current Is Nothing)
-                AET.add(current)
+                AET.Add(current)
                 'MsgBox("break")
                 current = current.nxt
                 'MsgBox(AET.length.ToString)
             End While
             'draw lines (don't forget about the normalization)
-            drawlines(i, g, pen)
+            drawlines(i, g, bmp, pen)
             'delete the double expired
             'CheckDoubleExpired() 'cause bug
             ' If i > 0 Then AET.double_expired(i)
             'update 
-            AET.update()
+            AET.Update()
             'sort
-            AET.sorted()
+            AET.Sorted()
             'sortAETStackVersion() ' is failed
         Next
     End Sub
@@ -99,7 +99,7 @@
         AET.sorted()
     End Sub
 
-    Public Sub drawlines(y As Integer, ByRef g As Graphics, pen As Pen)
+    Public Sub drawlines(y As Integer, ByRef g As Graphics, ByRef bmp As Bitmap, pen As Pen)
         If AET.length > 0 Then
             Dim data As EdgeTable = AET.head
             Dim data2 As EdgeTable = data.nxt
@@ -108,6 +108,7 @@
                 ' MsgBox(i.ToString + ": "+data.xmin.ToString + " " + data2.xmin.ToString)
                 If (data.xmin = data2.xmin) Then
                     'setpixel
+                    bmp.SetPixel(data.xmin, y + data.normalize, pen.Color)
                 Else
                     'MsgBox(AET.length.ToString + " -- " + (y + data.normalize).ToString)
                     g.DrawLine(pen, data.xmin, y + data.normalize, data2.xmin, y + data2.normalize)

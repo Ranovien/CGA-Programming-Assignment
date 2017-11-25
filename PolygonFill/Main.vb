@@ -119,6 +119,9 @@
                 PolyList.Items.Add("Polygon " + i.ToString)
             Next
             PointList.Items.Clear()
+            If PolygonArray.Count = 0 Then
+                TerminateEditMode()
+            End If
         Else
             MsgBox("Choose the polygon to be deleted!")
         End If
@@ -275,19 +278,32 @@
         Display()
     End Sub
 
+    Private Sub btnClearAll_Click(sender As Object, e As EventArgs) Handles btnClearAll.Click
+        PolygonArray.Clear()
+        PolyList.Items.Clear()
+        PointList.Items.Clear()
+        TerminateEditMode()
+        Display()
+    End Sub
+
     Public Sub Display()
         'Display the polygon
         'clear first
+        Dim intersectionofedges As Boolean = False
         g.Clear(Color.White)
         For i As Integer = 0 To PolygonArray.Count - 1
             'DrawpolygonAlt(PolygonArray(i), g)
+            If PolygonArray(i).IsEdgesIntersect() = True Then
+                intersectionofedges = True
+            End If
             If (PolygonArray(i).isfilled = True) Then
                 mypen = New Pen(PolygonArray(i).tcolor, 1)
-                FillPolygon(PolygonArray(i), g, mypen)
+                FillPolygon(PolygonArray(i), g, bit, mypen)
             Else
                 PolygonArray(i).Drawpolygon(g)
             End If
         Next
+        lblCross.Text = If(intersectionofedges = True, "Intesection : True ", "Intesection : False ")
         mypen.Dispose()
         PictureBox.Image = bit
     End Sub
@@ -302,6 +318,7 @@
         addmode = False
         btnEndEdit.Visible = False
         btnEndEdit.Enabled = False
+        btnAdd.BackColor = origincolor
     End Sub
 
     Private Sub EnableAddMode(sender As Object, e As EventArgs) Handles btnAdd.Click

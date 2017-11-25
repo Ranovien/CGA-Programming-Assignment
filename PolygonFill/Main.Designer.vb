@@ -45,6 +45,8 @@ Partial Class Main
         Me.btnEndEdit = New System.Windows.Forms.Button()
         Me.btnFront = New System.Windows.Forms.Button()
         Me.btnBack = New System.Windows.Forms.Button()
+        Me.lblCross = New System.Windows.Forms.Label()
+        Me.btnClearAll = New System.Windows.Forms.Button()
         CType(Me.PictureBox, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
@@ -53,7 +55,7 @@ Partial Class Main
         Me.PictureBox.BackColor = System.Drawing.SystemColors.HighlightText
         Me.PictureBox.Location = New System.Drawing.Point(13, 13)
         Me.PictureBox.Name = "PictureBox"
-        Me.PictureBox.Size = New System.Drawing.Size(796, 540)
+        Me.PictureBox.Size = New System.Drawing.Size(796, 575)
         Me.PictureBox.TabIndex = 0
         Me.PictureBox.TabStop = False
         '
@@ -148,7 +150,7 @@ Partial Class Main
         '
         'btnSave
         '
-        Me.btnSave.Location = New System.Drawing.Point(957, 527)
+        Me.btnSave.Location = New System.Drawing.Point(939, 557)
         Me.btnSave.Name = "btnSave"
         Me.btnSave.Size = New System.Drawing.Size(78, 31)
         Me.btnSave.TabIndex = 11
@@ -157,7 +159,7 @@ Partial Class Main
         '
         'btnLoad
         '
-        Me.btnLoad.Location = New System.Drawing.Point(1039, 527)
+        Me.btnLoad.Location = New System.Drawing.Point(1039, 557)
         Me.btnLoad.Name = "btnLoad"
         Me.btnLoad.Size = New System.Drawing.Size(75, 31)
         Me.btnLoad.TabIndex = 12
@@ -166,9 +168,9 @@ Partial Class Main
         '
         'btnColorpick
         '
-        Me.btnColorpick.Location = New System.Drawing.Point(834, 437)
+        Me.btnColorpick.Location = New System.Drawing.Point(834, 483)
         Me.btnColorpick.Name = "btnColorpick"
-        Me.btnColorpick.Size = New System.Drawing.Size(99, 31)
+        Me.btnColorpick.Size = New System.Drawing.Size(99, 38)
         Me.btnColorpick.TabIndex = 13
         Me.btnColorpick.Text = "Pick Color"
         Me.btnColorpick.UseVisualStyleBackColor = True
@@ -176,7 +178,7 @@ Partial Class Main
         'lblXpos
         '
         Me.lblXpos.AutoSize = True
-        Me.lblXpos.Location = New System.Drawing.Point(953, 485)
+        Me.lblXpos.Location = New System.Drawing.Point(959, 516)
         Me.lblXpos.Name = "lblXpos"
         Me.lblXpos.Size = New System.Drawing.Size(28, 20)
         Me.lblXpos.TabIndex = 14
@@ -185,7 +187,7 @@ Partial Class Main
         'lblYpos
         '
         Me.lblYpos.AutoSize = True
-        Me.lblYpos.Location = New System.Drawing.Point(1040, 485)
+        Me.lblYpos.Location = New System.Drawing.Point(1048, 516)
         Me.lblYpos.Name = "lblYpos"
         Me.lblYpos.Size = New System.Drawing.Size(28, 20)
         Me.lblYpos.TabIndex = 15
@@ -194,7 +196,7 @@ Partial Class Main
         'lblX
         '
         Me.lblX.AutoSize = True
-        Me.lblX.Location = New System.Drawing.Point(987, 485)
+        Me.lblX.Location = New System.Drawing.Point(1003, 516)
         Me.lblX.Name = "lblX"
         Me.lblX.Size = New System.Drawing.Size(14, 20)
         Me.lblX.TabIndex = 16
@@ -203,7 +205,7 @@ Partial Class Main
         'lblY
         '
         Me.lblY.AutoSize = True
-        Me.lblY.Location = New System.Drawing.Point(1074, 485)
+        Me.lblY.Location = New System.Drawing.Point(1082, 516)
         Me.lblY.Name = "lblY"
         Me.lblY.Size = New System.Drawing.Size(14, 20)
         Me.lblY.TabIndex = 17
@@ -211,19 +213,18 @@ Partial Class Main
         '
         'lblColor
         '
-        Me.lblColor.AutoSize = True
         Me.lblColor.BackColor = System.Drawing.SystemColors.InfoText
         Me.lblColor.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
-        Me.lblColor.Location = New System.Drawing.Point(957, 442)
+        Me.lblColor.Location = New System.Drawing.Point(963, 483)
         Me.lblColor.Name = "lblColor"
-        Me.lblColor.Size = New System.Drawing.Size(87, 22)
+        Me.lblColor.Size = New System.Drawing.Size(120, 22)
         Me.lblColor.TabIndex = 18
         Me.lblColor.Text = "                   "
         '
         'lblToggle
         '
         Me.lblToggle.AutoSize = True
-        Me.lblToggle.Location = New System.Drawing.Point(957, 410)
+        Me.lblToggle.Location = New System.Drawing.Point(959, 405)
         Me.lblToggle.Name = "lblToggle"
         Me.lblToggle.Size = New System.Drawing.Size(108, 20)
         Me.lblToggle.TabIndex = 19
@@ -233,9 +234,9 @@ Partial Class Main
         '
         Me.btnEndEdit.AccessibleRole = System.Windows.Forms.AccessibleRole.None
         Me.btnEndEdit.Enabled = False
-        Me.btnEndEdit.Location = New System.Drawing.Point(834, 481)
+        Me.btnEndEdit.Location = New System.Drawing.Point(834, 527)
         Me.btnEndEdit.Name = "btnEndEdit"
-        Me.btnEndEdit.Size = New System.Drawing.Size(99, 72)
+        Me.btnEndEdit.Size = New System.Drawing.Size(99, 61)
         Me.btnEndEdit.TabIndex = 20
         Me.btnEndEdit.Text = "End Edit Mode"
         Me.btnEndEdit.UseVisualStyleBackColor = True
@@ -259,11 +260,31 @@ Partial Class Main
         Me.btnBack.Text = "To Back"
         Me.btnBack.UseVisualStyleBackColor = True
         '
+        'lblCross
+        '
+        Me.lblCross.AutoSize = True
+        Me.lblCross.Location = New System.Drawing.Point(959, 445)
+        Me.lblCross.Name = "lblCross"
+        Me.lblCross.Size = New System.Drawing.Size(109, 20)
+        Me.lblCross.TabIndex = 23
+        Me.lblCross.Text = "Intesection : - "
+        '
+        'btnClearAll
+        '
+        Me.btnClearAll.Location = New System.Drawing.Point(834, 437)
+        Me.btnClearAll.Name = "btnClearAll"
+        Me.btnClearAll.Size = New System.Drawing.Size(99, 40)
+        Me.btnClearAll.TabIndex = 24
+        Me.btnClearAll.Text = "Clear All"
+        Me.btnClearAll.UseVisualStyleBackColor = True
+        '
         'Main
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(1126, 570)
+        Me.ClientSize = New System.Drawing.Size(1126, 600)
+        Me.Controls.Add(Me.btnClearAll)
+        Me.Controls.Add(Me.lblCross)
         Me.Controls.Add(Me.btnBack)
         Me.Controls.Add(Me.btnFront)
         Me.Controls.Add(Me.btnEndEdit)
@@ -318,4 +339,6 @@ Partial Class Main
     Friend WithEvents btnEndEdit As Button
     Friend WithEvents btnFront As Button
     Friend WithEvents btnBack As Button
+    Friend WithEvents lblCross As Label
+    Friend WithEvents btnClearAll As Button
 End Class
