@@ -79,8 +79,8 @@
             'draw lines (don't forget about the normalization)
             drawlines(i, g, bmp, pen)
             'delete the double expired
-            'CheckDoubleExpired() 'cause bug
-            ' If i > 0 Then AET.double_expired(i)
+            '
+            If i > 0 Then CheckDoubleExpired(i) 'cause bug
             'update 
             AET.Update()
             'sort
@@ -93,7 +93,6 @@
         If AET.length > 0 Then
             Dim data As EdgeTable = AET.head
             Dim data2 As EdgeTable = data.nxt
-            Dim i As Integer = 0
             While Not (data Is Nothing Or data2 Is Nothing)
                 ' MsgBox(i.ToString + ": "+data.xmin.ToString + " " + data2.xmin.ToString)
                 If (data.xmin = data2.xmin) Then
@@ -104,7 +103,6 @@
                     g.DrawLine(pen, data.xmin, y + data.normalize, data2.xmin, y + data2.normalize)
                 End If
                 data = data.nxt.nxt
-                i = i + 1
                 If Not (data Is Nothing) Then
                     data2 = data.nxt
                 Else
@@ -139,31 +137,27 @@
         'replace AET with new one
     End Sub
 
-    Public Sub CheckDoubleExpired()
-        'create new container
-        Dim temp As EdgeTable = Nothing
-        If (AET.CountAET() > 1) Then
-            Dim data As EdgeTable = AET.head
-            Dim data2 As EdgeTable = data.nxt
-            While Not (data Is Nothing Or data2 Is Nothing)
-                If (data.xmin = data2.xmin) And (data.carry = 0) And (data2.carry = 0) Then
-                    'delete node by ignoring it
-                    data = data.nxt.nxt
-                    If Not (data Is Nothing) Then
-                        data2 = data.nxt
-                    End If
-                Else
-                    sortedInsertion(temp, data)
-                    sortedInsertion(temp, data2)
-                    data = data.nxt.nxt
-                    If Not (data Is Nothing) Then
-                        data2 = data.nxt
+    Public Sub CheckDoubleExpired(y As Integer)
+        'create a counter
+        If (AET.CountAET() > 0) Then
+            Dim currentdata As EdgeTable = AET.head
+            Dim nextdata As EdgeTable = currentdata.nxt
+            Dim counter As Integer = 0
+            While Not (currentdata Is Nothing)
+                If (currentdata.xmin = nextdata.xmin) And (currentdata.carry = 0) And (nextdata.carry = 0) Then
+                    If (currentdata.ymax = y + currentdata.normalize - 1) And (nextdata.ymax <> y + nextdata.normalize - 1) Then
+                        AET.Remove(counter + 1)
+                        counter = counter - 1
+                        AET.Remove(counter)
                     End If
                 End If
+                counter = counter + 1
+                currentdata = currentdata.nxt
             End While
         End If
-        'replace AET with new one
+
     End Sub
+
 
 
     Public Sub sortedInsertion(ByRef target As EdgeTable, temp As EdgeTable)
