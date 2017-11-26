@@ -28,7 +28,7 @@
         Dim max As Integer = getMaximumY(a.vertices)
         Dim size As Integer = max - min + 1
         resizeArray(edgetable, size)  'resize the array for the iteration in AEL, may cause problem
-        Dim d, horizon As Integer
+        Dim d As Integer
         'the increment
         For i As Integer = 0 To a.size
             d = i + 1
@@ -36,8 +36,6 @@
                 'if it's the last index, make the line with last point and start point
                 d = 0
             End If
-            horizon = a.vertices(d).Y - a.vertices(i).Y
-            If horizon < 0 Then horizon = -(horizon)
             If Not (a.vertices(i).Y = a.vertices(d).Y) Then
                 'If it Is Not horizontal line (a.vertices(i).Y = a.vertices(d).Y) Then fill all data 
                 Dim temp As New EdgeTable
@@ -89,14 +87,6 @@
             AET.Sorted()
             'sortAETStackVersion() ' is failed
         Next
-    End Sub
-
-    Public Sub updateAET()
-        AET.update()
-    End Sub
-
-    Public Sub sortAET()
-        AET.sorted()
     End Sub
 
     Public Sub drawlines(y As Integer, ByRef g As Graphics, ByRef bmp As Bitmap, pen As Pen)

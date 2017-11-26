@@ -71,7 +71,6 @@
     Private Sub EndDrawPolygon(sender As Object, e As EventArgs) Handles PictureBox.MouseDoubleClick
         'Draw the last vertex of the polygon
         If (editmode = False) Then
-
             If (TempPolygon.isPolygon()) Then
                 'execute if the polygon is 
                 TempPolygon.isfilled = fill
@@ -221,7 +220,8 @@
         save.Title = "Save"
         save.ShowDialog()
         If (save.FileName <> "") Then
-            FILE_NAME = IO.Path.Combine(FILE_PATH, save.FileName)
+            'FILE_NAME = IO.Path.Combine(FILE_PATH, save.FileName)
+            FILE_NAME = save.FileName
             save.Dispose()
             System.IO.File.WriteAllText(FILE_NAME, "")
             Dim objWriter As New System.IO.StreamWriter(FILE_NAME)
