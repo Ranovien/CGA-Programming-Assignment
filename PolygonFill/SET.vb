@@ -1,4 +1,5 @@
 ﻿Public Class EdgeTable
+    'updated
     Public ymin As Integer
     Public ymax As Integer
     Public xmin As Integer
